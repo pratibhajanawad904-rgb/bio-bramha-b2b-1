@@ -147,17 +147,21 @@ export type Offer = {
 export const DEFAULT_HELPLINE_NUMBER = '1800-425-9999 / +91 94400 12345'
 export const DEFAULT_HELPLINE_EMAIL = 'support@biobramha.com'
 
+// MVP V1: single default warehouse — Taloja, Mumbai, Maharashtra.
+export const DEFAULT_WAREHOUSE_NAME = 'Bio-Bramha Taloja Warehouse Hub'
+export const DEFAULT_WAREHOUSE_LOCATION = 'Taloja, Mumbai, Maharashtra'
+
 export const WAREHOUSES: Warehouse[] = [
   {
     id: 'wh-central',
-    name: 'Bio-Bramha Central Warehouse Hub',
-    code: 'WH-BB-MAIN',
-    state: 'AP',
-    city: 'Guntur',
-    managerName: 'Venkateswarlu P. (Warehouse Manager)',
+    name: DEFAULT_WAREHOUSE_NAME,
+    code: 'WH-BB-TALOJA',
+    state: 'MH',
+    city: 'Taloja, Mumbai',
+    managerName: 'Warehouse Manager',
     currentStockUnits: 17400,
     activeOrdersCount: 52,
-    address: 'Plot 45, Auto Nagar Industrial Estate, Guntur, AP - 522001'
+    address: 'Taloja Industrial Area, Navi Mumbai, Maharashtra'
   }
 ]
 

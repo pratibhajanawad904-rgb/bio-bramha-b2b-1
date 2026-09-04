@@ -206,11 +206,7 @@ export async function POST(request: Request) {
       const qty = Math.floor(Number(item?.qty ?? 0))
       if (!Number.isFinite(qty) || qty < 1) return badRequest(`Invalid quantity for ${product.name}.`)
 
-      // Enforce the minimum order quantity for bulk lines.
-      if (product.main_category === 'bulk') {
-        const moq = Number(product.moq || 20)
-        if (qty < moq) return badRequest(`${product.name} requires a minimum of ${moq} units.`)
-      }
+      // MVP V1: minimum order quantity is 1 unit for every product (no bulk MOQ).
 
       resolvedItems.push({
         productId: product.id,

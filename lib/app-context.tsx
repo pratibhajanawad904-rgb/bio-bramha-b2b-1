@@ -340,7 +340,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         phone: o.phone || '',
         state: (o.state || 'AP') as IndianState,
         warehouseId: o.warehouse_id || 'wh-central',
-        warehouseName: 'Bio-Bramha Central Warehouse Hub',
+        warehouseName: 'Bio-Bramha Taloja Warehouse Hub',
         buyerId: o.buyer_id || '',
         buyerName: o.buyer_name || 'Buyer',
         buyerEmail: o.buyer_email || undefined,
@@ -804,7 +804,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const product = products.find(p => p.id === productId)
     if (!product) return
 
-    const minMoq = product.main_category === 'bulk' ? (product.moq || 20) : 1
+    // MVP V1: minimum order quantity is 1 unit for every product.
+    const minMoq = 1
     const validQty = Math.max(minMoq, quantity)
 
     setCart(prev => {
@@ -825,8 +826,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }
 
   const updateCartItemQuantity = (productId: string, quantity: number) => {
-    const product = products.find(p => p.id === productId)
-    const minMoq = product && product.main_category === 'bulk' ? (product.moq || 20) : 1
+    // MVP V1: minimum order quantity is 1 unit for every product.
+    const minMoq = 1
 
     if (quantity < minMoq) {
       removeFromCart(productId)
@@ -871,7 +872,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       phone: orderData.phone,
       state: orderData.state as any,
       warehouseId: orderData.warehouseId,
-      warehouseName: 'Bio-Bramha Central Warehouse Hub',
+      warehouseName: 'Bio-Bramha Taloja Warehouse Hub',
       buyerId: currentUser.id,
       buyerName: orderData.buyerName,
       buyerEmail: orderData.buyerEmail,

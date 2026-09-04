@@ -30,33 +30,39 @@ function ImageWithLoader({ src, alt, className }: { src: string; alt: string; cl
 }
 
 export const ProductCatalog: React.FC = () => {
-  const { products, currentUser, offers, setSelectedProduct, addToCart, cart, updateCartItemQuantity, getProductOfferInfo, updateProduct, secondaryCategories } = useApp()
+  const { products, currentUser, offers, setSelectedProduct, addToCart, cart, updateCartItemQuantity, getProductOfferInfo, secondaryCategories } = useApp()
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [selectedSegment, setSelectedSegment] = useState<'all' | 'bulk' | 'non-bulk'>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [addedNotice, setAddedNotice] = useState<string | null>(null)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
-  // A tag/secondary-category pill is only shown if at least one product currently carries it.
-  // Products can carry multiple tags, so pills map to "any product has this tag in its list".
-  const visibleSecondaryCategories = secondaryCategories.filter((cat) =>
+  // Discover all category tags: Primary categories from products + Secondary Categories from admin
+  const primaryCategories = Array.from(new Set(products.map((p) => p.category).filter(Boolean)))
+  const assignedSecondaryCats = secondaryCategories.filter((cat) =>
     products.some((p) => p.secondary_category_ids?.includes(cat.id))
   )
 
-  // If the selected pill's tag no longer has any matching products (last product
-  // untagged/deleted), fall back to "All" instead of showing an empty grid with no active pill.
+  const allCategoryTags = [
+    { id: 'All', name: 'All' },
+    ...primaryCategories.map((cat) => ({ id: cat, name: cat })),
+    ...assignedSecondaryCats.map((cat) => ({ id: cat.id, name: cat.name }))
+  ]
+
+  // If the selected category tag is no longer valid, fallback to "All"
   useEffect(() => {
-    if (selectedCategory !== 'All' && !visibleSecondaryCategories.some((c) => c.id === selectedCategory)) {
+    if (selectedCategory !== 'All' && !allCategoryTags.some((c) => c.id === selectedCategory)) {
       setSelectedCategory('All')
     }
-  }, [selectedCategory, visibleSecondaryCategories])
+  }, [selectedCategory, allCategoryTags])
 
-  // Filter products by secondary category tag, search query & main_category.
-  // "All" plus every tag that has at least one product shows up as a pill —
-  // adding a new secondary category in the admin dashboard adds a pill here automatically
-  // once a product is tagged with it, and the pill disappears again if no product uses it.
+  // Filter products by category tag, search query & main_category segment.
   const filteredProducts = products.filter((p) => {
-    const matchesCategory = selectedCategory === 'All' || p.secondary_category_ids?.includes(selectedCategory)
+    const matchesCategory =
+      selectedCategory === 'All' ||
+      p.category === selectedCategory ||
+      p.secondary_category_ids?.includes(selectedCategory)
+
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.benefit.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -77,10 +83,10 @@ export const ProductCatalog: React.FC = () => {
   // Active Direct Offers List
   const activeOffers = offers.filter((o) => o.active)
 
+  // MVP V1: adding always starts at a single unit.
   const handleQuickAdd = (product: Product, e: React.MouseEvent) => {
     e.stopPropagation()
-    const addQty = product.main_category === 'bulk' ? (product.moq || 20) : 1
-    addToCart(product.id, addQty)
+    addToCart(product.id, 1)
     setAddedNotice(product.name)
     setTimeout(() => setAddedNotice(null), 2000)
   }
@@ -91,39 +97,39 @@ export const ProductCatalog: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-6 sm:space-y-8 pb-12" data-testid="product-catalog">
       {/* Role Notice Banner */}
       {currentUser.role !== 'buyer' && (
-        <div className="bg-slate-900 text-white rounded-2xl p-4 shadow-md flex items-center justify-between border border-slate-800">
-          <div className="flex items-center gap-3">
+        <div className="bg-slate-900 text-white rounded-2xl p-3.5 sm:p-4 shadow-md flex items-center justify-between gap-3 border border-slate-800">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             {currentUser.role === 'warehouse' ? (
-              <Warehouse className="w-5 h-5 text-amber-400" />
+              <Warehouse className="w-5 h-5 text-amber-400 shrink-0" />
             ) : (
-              <ShieldCheck className="w-5 h-5 text-indigo-400" />
+              <ShieldCheck className="w-5 h-5 text-indigo-400 shrink-0" />
             )}
-            <div>
-              <span className="font-bold text-sm block">
+            <div className="min-w-0">
+              <span className="font-bold text-xs sm:text-sm block truncate">
                 {currentUser.role === 'warehouse' ? 'Warehouse Mode' : 'Admin Mode'}: Product Inspection
               </span>
-              <span className="text-xs text-slate-400">
-                Viewing live catalog prices, MOQ limits, and active offers.
+              <span className="text-[11px] sm:text-xs text-slate-400 block truncate">
+                Viewing live catalog prices and active offers.
               </span>
             </div>
           </div>
-          <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1 rounded-full uppercase">
-            {currentUser.role} view
+          <span className="text-[10px] sm:text-xs font-mono font-bold bg-white/10 px-2.5 py-1 rounded-full uppercase shrink-0 whitespace-nowrap">
+            {currentUser.role === 'super_admin' ? 'Super Admin' : currentUser.role}
           </span>
         </div>
       )}
 
       {/* Active Admin Direct Offers Banner */}
       {activeOffers.length > 0 && (
-        <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white rounded-2xl p-5 shadow-xl border border-emerald-600/30 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white rounded-2xl p-4 sm:p-5 shadow-xl border border-emerald-600/30 relative overflow-hidden">
           <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div className="flex items-start gap-3.5">
-              <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center text-amber-300 shrink-0 border border-white/20">
-                <Tag className="w-6 h-6" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center text-amber-300 shrink-0 border border-white/20">
+                <Tag className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -131,7 +137,7 @@ export const ProductCatalog: React.FC = () => {
                     Direct Special Offers Active
                   </span>
                 </div>
-                <h3 className="text-lg font-bold mt-1 text-white flex items-center gap-2">
+                <h3 className="text-sm sm:text-lg font-bold mt-1 text-white flex items-center gap-2">
                   Instant Discounts Applied Directly in Catalogue!
                 </h3>
               </div>
@@ -140,27 +146,18 @@ export const ProductCatalog: React.FC = () => {
         </div>
       )}
 
-      {/* Catalog Search & Category Filters */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* Catalog Search & Category Filter Tags */}
+      <div className="bg-white rounded-2xl p-3.5 sm:p-5 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-3.5">
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 no-scrollbar">
-          <button
-            onClick={() => setSelectedCategory('All')}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              selectedCategory === 'All'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20 scale-102'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
-            }`}
-          >
-            All
-          </button>
-          {visibleSecondaryCategories.map((cat) => (
+          {allCategoryTags.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              data-testid={`category-filter-${cat.id}`}
+              className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                 selectedCategory === cat.id
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20 scale-102'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
+                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900 border border-slate-200/60'
               }`}
             >
               {cat.name}
@@ -168,48 +165,50 @@ export const ProductCatalog: React.FC = () => {
           ))}
         </div>
 
-        <div className="relative w-full md:w-72">
+        <div className="relative w-full md:w-72 shrink-0">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search bio-fertilizers, crops..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+            data-testid="product-search-input"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-slate-50/50"
           />
         </div>
       </div>
 
       {/* Notice Toast */}
       {addedNotice && (
-        <div className="fixed bottom-6 right-6 z-50 bg-emerald-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-emerald-700 animate-slide-in-up">
+        <div className="fixed bottom-24 md:bottom-6 right-4 sm:right-6 z-50 bg-emerald-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-emerald-700 animate-slide-in-up" data-testid="added-to-cart-toast">
           <Check className="w-5 h-5 text-emerald-400" />
           <span className="text-sm font-semibold">{addedNotice} added to cart!</span>
         </div>
       )}
 
-      {/* Segment Filter Tabs (BULK / Non-BULK) */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
+      {/* Segment Switcher Tabs (All / Bulk / Non-Bulk) */}
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1 mr-0.5">
           <Package className="w-3.5 h-3.5" />
           Category:
         </span>
         {[
-          { key: 'all' as const, label: 'All Products' },
-          { key: 'bulk' as const, label: 'BULK Products' },
-          { key: 'non-bulk' as const, label: 'Non-BULK / Retail' },
+          { key: 'all' as const, label: 'All' },
+          { key: 'bulk' as const, label: 'Bulk' },
+          { key: 'non-bulk' as const, label: 'Non-Bulk' },
         ].map((seg) => (
           <button
             key={seg.key}
             onClick={() => setSelectedSegment(seg.key)}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            data-testid={`segment-filter-${seg.key}`}
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
               selectedSegment === seg.key
                 ? seg.key === 'bulk'
-                  ? 'bg-amber-600 text-white shadow-md'
+                  ? 'bg-amber-600 text-white shadow-sm shadow-amber-600/30'
                   : seg.key === 'non-bulk'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-emerald-600 text-white shadow-md'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                  : 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900 border border-slate-200/60'
             }`}
           >
             {seg.label}
@@ -223,18 +222,15 @@ export const ProductCatalog: React.FC = () => {
           <p className="text-slate-500 font-medium">No bio-products found matching your search.</p>
         </div>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-8 sm:space-y-10">
           {(selectedSegment === 'all' || selectedSegment === 'bulk') && bulkProducts.length > 0 && (
             <section className="space-y-4">
               <div className="flex items-center gap-2 border-b border-amber-200 pb-2">
-                <span className="text-xl font-extrabold text-amber-900 flex items-center gap-2">
-                  📦 BULK Products
-                </span>
-                <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                  Minimum Order Quantities Apply
+                <span className="text-lg sm:text-xl font-extrabold text-amber-900 flex items-center gap-2">
+                  📦 Bulk Products
                 </span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {bulkProducts.map((p) => (
                   <ProductCard
                     key={p.id}
@@ -255,14 +251,11 @@ export const ProductCatalog: React.FC = () => {
           {(selectedSegment === 'all' || selectedSegment === 'non-bulk') && nonBulkProducts.length > 0 && (
             <section className="space-y-4">
               <div className="flex items-center gap-2 border-b border-blue-200 pb-2">
-                <span className="text-xl font-extrabold text-blue-900 flex items-center gap-2">
-                  🏷️ Non-BULK Products
-                </span>
-                <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                  Retail & Specialty Formulations
+                <span className="text-lg sm:text-xl font-extrabold text-blue-900 flex items-center gap-2">
+                  🏷️ Non-Bulk Products
                 </span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {nonBulkProducts.map((p) => (
                   <ProductCard
                     key={p.id}
@@ -302,7 +295,8 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
   const cartItem = cart.find((item: any) => item.productId === p.id)
   const qtyInCart = cartItem ? cartItem.quantity : 0
   const isBulk = p.main_category === 'bulk'
-  const moqVal = isBulk ? (p.moq || 20) : 1
+
+  const unitPrice = offerInfo.hasOffer ? offerInfo.finalPrice : p.price
 
   // Check if user is warehouse role
   const isWarehouse = currentUser.role === 'warehouse'
@@ -312,6 +306,7 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
   return (
     <div
       key={p.id}
+      data-testid={`product-card-${p.id}`}
       className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-emerald-300 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
     >
       <div>
@@ -324,7 +319,7 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
           <span className={`absolute bottom-3 left-3 text-[10px] font-black uppercase px-2 py-0.5 rounded-md z-10 ${
             isBulk ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-blue-100 text-blue-900 border border-blue-300'
           }`}>
-            {isBulk ? `📦 BULK (MOQ: ${moqVal})` : '🏷️ Non-BULK'}
+            {isBulk ? '📦 Bulk' : '🏷️ Non-Bulk'}
           </span>
 
           {/* Direct Offer Badge */}
@@ -348,7 +343,7 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
         </div>
 
         {/* Info Content */}
-        <div className="p-5">
+        <div className="p-4 sm:p-5">
           <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 mb-1">
             <span>{p.category}</span>
             <span>•</span>
@@ -357,7 +352,7 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
 
           <h3
             onClick={() => setSelectedProduct(p)}
-            className="text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors cursor-pointer line-clamp-2"
+            className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors cursor-pointer line-clamp-2"
           >
             {p.name}
           </h3>
@@ -370,30 +365,29 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
         </div>
       </div>
 
-      {/* Price & Action Stepper */}
-      <div className="p-5 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between gap-3">
-        <div>
-          <span className="text-xs text-slate-400 block font-medium">Price</span>
-          {offerInfo.hasOffer ? (
-            <div>
+      {/* Price & Action */}
+      <div className="p-4 sm:p-5 pt-3 border-t border-slate-100 space-y-3">
+        {/* Clear unit price display */}
+        <div className="flex items-end justify-between gap-2">
+          <div>
+            <span className="text-xs text-slate-400 block font-medium">Unit Price</span>
+            {offerInfo.hasOffer ? (
               <div className="flex items-baseline gap-2">
-                <span className="text-lg font-black text-emerald-700">₹{offerInfo.finalPrice}/unit</span>
+                <span className="text-xl font-black text-emerald-700" data-testid={`product-price-${p.id}`}>₹{unitPrice}</span>
+                <span className="text-sm text-slate-500 font-semibold">/ unit</span>
                 <span className="text-xs text-slate-400 line-through">₹{offerInfo.originalPrice}</span>
               </div>
-              {isBulk && (
-                <span className="text-[11px] font-bold text-amber-800 block">
-                  (₹{(offerInfo.finalPrice * moqVal).toLocaleString('en-IN')} for MOQ of {moqVal} units)
-                </span>
-              )}
-            </div>
-          ) : (
-            <div>
-              <span className="text-lg font-black text-slate-900">₹{p.price}/unit</span>
-              {isBulk && (
-                <span className="text-[11px] font-bold text-amber-800 block">
-                  (₹{(p.price * moqVal).toLocaleString('en-IN')} for MOQ of {moqVal} units)
-                </span>
-              )}
+            ) : (
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-black text-slate-900" data-testid={`product-price-${p.id}`}>₹{unitPrice}</span>
+                <span className="text-sm text-slate-500 font-semibold">/ unit</span>
+              </div>
+            )}
+          </div>
+          {qtyInCart > 0 && (
+            <div className="text-right">
+              <span className="text-[11px] text-slate-400 block font-medium">In cart</span>
+              <span className="text-sm font-bold text-emerald-700">₹{(unitPrice * qtyInCart).toLocaleString('en-IN')}</span>
             </div>
           )}
         </div>
@@ -405,7 +399,7 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
               e.stopPropagation()
               setEditingProduct(p)
             }}
-            className="py-2 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
+            className="w-full min-h-[44px] py-2.5 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Edit product details"
           >
             <Eye className="w-4 h-4 text-blue-600" />
@@ -419,7 +413,7 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
                 deleteProduct(p.id)
               }
             }}
-            className="py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
+            className="w-full min-h-[44px] py-2.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             title="Delete product from catalogue"
           >
             <Trash2 className="w-4 h-4 text-rose-600" />
@@ -428,29 +422,37 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
         ) : qtyInCart === 0 ? (
           <button
             onClick={(e) => handleQuickAdd(p, e)}
-            className="py-2 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0"
+            data-testid={`add-to-cart-${p.id}`}
+            className="w-full min-h-[46px] py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-xl text-sm sm:text-base font-bold transition-all shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer"
           >
-            <ShoppingCart className="w-4 h-4" />
-            <span>Add {isBulk ? `(${moqVal} MOQ)` : ''}</span>
+            <ShoppingCart className="w-5 h-5" />
+            <span>Add to Cart</span>
           </button>
         ) : (
-          <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-xl p-1 shrink-0">
+          <div className="flex items-center justify-between gap-2 bg-emerald-50 border border-emerald-200 rounded-xl p-1.5" data-testid={`cart-stepper-${p.id}`}>
             <button
-              onClick={(e) => updateCartQty(p.id, Math.max(0, qtyInCart - moqVal), e)}
-              className="w-7 h-7 bg-white rounded-lg flex items-center justify-center text-emerald-700 font-bold hover:bg-emerald-100 transition-colors shadow-xs cursor-pointer"
+              onClick={(e) => updateCartQty(p.id, qtyInCart - 1, e)}
+              data-testid={`decrease-qty-${p.id}`}
+              className="w-11 h-11 bg-white rounded-lg flex items-center justify-center text-emerald-700 font-bold hover:bg-emerald-100 transition-colors shadow-xs cursor-pointer shrink-0"
+              aria-label="Decrease quantity"
             >
-              <Minus className="w-3.5 h-3.5" />
+              <Minus className="w-4 h-4" />
             </button>
 
-            <span className="text-xs font-black text-emerald-950 px-2 min-w-[24px] text-center">
-              {qtyInCart}
-            </span>
+            <div className="text-center flex-1">
+              <span className="text-base font-black text-emerald-950 block leading-none" data-testid={`cart-qty-${p.id}`}>
+                {qtyInCart}
+              </span>
+              <span className="text-[10px] text-emerald-700 font-semibold">in cart</span>
+            </div>
 
             <button
-              onClick={(e) => updateCartQty(p.id, qtyInCart + moqVal, e)}
-              className="w-7 h-7 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer"
+              onClick={(e) => updateCartQty(p.id, qtyInCart + 1, e)}
+              data-testid={`increase-qty-${p.id}`}
+              className="w-11 h-11 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer shrink-0"
+              aria-label="Increase quantity"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
             </button>
           </div>
         )}

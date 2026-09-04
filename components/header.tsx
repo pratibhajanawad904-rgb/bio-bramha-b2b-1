@@ -50,10 +50,6 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, setIsCa
               <span className="text-[8px] xs:text-[9px] sm:text-[10px] font-extrabold uppercase px-1 py-0.2 sm:px-2 sm:py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                 B2B
               </span>
-              <span className="hidden sm:inline-flex text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
-                Supabase Cloud Live
-              </span>
             </h1>
             <p className="text-[10px] sm:text-xs text-slate-500 hidden sm:block">Bio-Bramha | Bio-Fertilizers & Crop Care</p>
           </div>

@@ -121,10 +121,11 @@ export const MobileOTPModal: React.FC<MobileOTPModalProps> = ({ isOpen, onClose 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top,1rem))] pb-[max(1rem,env(safe-area-inset-bottom,1rem))] bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
       <div 
-        className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden"
+        className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden my-auto"
         onClick={e => e.stopPropagation()}
+        data-testid="otp-modal"
       >
         {/* Header */}
         <div className="relative p-6 pb-4 border-b border-slate-100 flex items-center justify-between">
@@ -269,7 +270,8 @@ export const MobileOTPModal: React.FC<MobileOTPModalProps> = ({ isOpen, onClose 
         {/* Footer */}
         <div className="bg-slate-50 p-4 text-center border-t border-slate-100">
           <p className="text-xs text-slate-400 flex items-center justify-center gap-1">
-            Secured by <span className="font-semibold text-slate-600">MSG91 Gateway</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+            Secure OTP verification
           </p>
         </div>
       </div>

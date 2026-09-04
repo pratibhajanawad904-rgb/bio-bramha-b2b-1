@@ -218,6 +218,8 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
                   onChange={(e) => setPhoneInput(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
                   required
                   maxLength={10}
+                  inputMode="numeric"
+                  data-testid="login-phone-input"
                   className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-base font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 text-slate-900 tracking-wider"
                 />
               </div>
@@ -255,6 +257,8 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
                 onChange={(e) => setOtpInput(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
                 required
                 maxLength={6}
+                inputMode="numeric"
+                data-testid="login-otp-input"
                 className="w-full text-center px-4 py-3.5 rounded-xl border border-slate-300 text-xl font-mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50"
               />
             </div>

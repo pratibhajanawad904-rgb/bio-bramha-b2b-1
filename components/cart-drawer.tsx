@@ -66,30 +66,25 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onOrder
             ) : (
               cartDetails.map(({ productId, quantity, product, offerInfo }) => {
                 if (!product) return null
-                const isBulk = product.main_category === 'bulk'
-                const moqStep = isBulk ? (product.moq || 20) : 1
+                const unitPrice = offerInfo.hasOffer ? offerInfo.finalPrice : product.price
 
                 return (
                   <div
                     key={productId}
+                    data-testid={`cart-item-${productId}`}
                     className="flex items-center gap-3.5 p-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-white transition-colors"
                   >
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-16 h-16 object-contain rounded-xl bg-white p-1 border border-slate-200"
+                      className="w-16 h-16 object-contain rounded-xl bg-white p-1 border border-slate-200 shrink-0"
                     />
 
                     <div className="flex-1 min-w-0">
                       <h4 className="font-bold text-slate-900 text-sm truncate">{product.name}</h4>
-                      {isBulk && (
-                        <span className="text-[10px] font-bold uppercase text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 inline-block mb-1">
-                          MOQ Stepper: {moqStep} units
-                        </span>
-                      )}
                       {offerInfo.hasOffer ? (
                         <div className="flex items-center gap-1.5 text-xs">
-                          <span className="font-mono font-bold text-emerald-700">₹{offerInfo.finalPrice}/unit</span>
+                          <span className="font-mono font-bold text-emerald-700">₹{offerInfo.finalPrice} / unit</span>
                           <span className="line-through text-slate-400 text-[11px]">₹{offerInfo.originalPrice}</span>
                           <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded">
                             {offerInfo.discountPercentage}% OFF
@@ -99,28 +94,34 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onOrder
                         <p className="text-xs text-slate-500 font-mono">₹{product.price} / unit</p>
                       )}
 
-                      {/* Quantity Controls */}
+                      {/* Quantity Controls (minimum 1 unit) */}
                       <div className="flex items-center gap-2 mt-2">
                         <button
-                          onClick={() => updateCartItemQuantity(productId, Math.max(0, quantity - moqStep))}
-                          className="w-6 h-6 rounded-md bg-white border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-100 cursor-pointer"
+                          onClick={() => updateCartItemQuantity(productId, quantity - 1)}
+                          data-testid={`cart-decrease-${productId}`}
+                          className="w-8 h-8 rounded-md bg-white border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-100 cursor-pointer"
+                          aria-label="Decrease quantity"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="text-xs font-bold w-8 text-center">{quantity}</span>
+                        <span className="text-sm font-bold w-8 text-center" data-testid={`cart-qty-${productId}`}>{quantity}</span>
                         <button
-                          onClick={() => updateCartItemQuantity(productId, quantity + moqStep)}
-                          className="w-6 h-6 rounded-md bg-white border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-100 cursor-pointer"
+                          onClick={() => updateCartItemQuantity(productId, quantity + 1)}
+                          data-testid={`cart-increase-${productId}`}
+                          className="w-8 h-8 rounded-md bg-white border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-100 cursor-pointer"
+                          aria-label="Increase quantity"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <span className="font-bold text-slate-900 text-sm block">₹{offerInfo.finalPrice * quantity}</span>
+                    <div className="text-right shrink-0">
+                      <span className="text-[10px] text-slate-400 block font-medium">Total</span>
+                      <span className="font-bold text-slate-900 text-sm block" data-testid={`cart-line-total-${productId}`}>₹{(unitPrice * quantity).toLocaleString('en-IN')}</span>
                       <button
                         onClick={() => removeFromCart(productId)}
+                        data-testid={`cart-remove-${productId}`}
                         className="text-slate-400 hover:text-rose-600 transition-colors p-1 mt-1 inline-block cursor-pointer"
                         title="Remove"
                       >
@@ -148,7 +149,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onOrder
 
               <button
                 onClick={() => setIsCheckoutOpen(true)}
-                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                data-testid="proceed-to-checkout-btn"
+                className="w-full min-h-[48px] py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Proceed to Checkout</span>
                 <ArrowRight className="w-4 h-4" />
