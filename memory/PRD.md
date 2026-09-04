@@ -66,3 +66,14 @@ improvements; apply specific business/UI corrections.
 - Verified: next build succeeds; login renders correctly at 360px.
 - NOTE: "Could not send OTP" in the preview browser is expected — /api/auth/send-otp needs
   MSG91+Supabase env keys and same-origin routing, available on Vercel/native, not preview.
+
+## Iteration 4 (2026-06) — Env / OTP resolution
+- Root cause of "Could not send OTP": no .env.local existed; server route threw on missing
+  MSG91_AUTH_KEY. Created /app/.env.local with existing MSG91 creds (from .env.example) +
+  generated SESSION_SECRET.
+- User supplied real Supabase creds; added to /app/.env.local (URL/anon publishable/service-role).
+- Verified locally: /api/settings returns live DB data (Supabase OK); /api/auth/send-otp -> success
+  (MSG91 OK); /api/auth/verify-otp reaches account lookup, returns clean 400 on bad code.
+- NOTE: Emergent preview URL routes /api to a separate port and does not serve this Next app's
+  API routes -> OTP only testable on Vercel / Capacitor. User must also add the 7 env vars in
+  Vercel project settings (.env.local is not deployed).
