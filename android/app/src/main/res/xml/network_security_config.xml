@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Blocks plaintext HTTP for the whole app.
+
+  The manifest previously set android:usesCleartextTraffic="true", which allowed the
+  WebView and any native HTTP call to fall back to unencrypted HTTP. On a hostile
+  network that permits interception and modification of OTP requests and API traffic.
+
+  Capacitor serves the bundled web assets over https://localhost via its local
+  scheme, so no cleartext exception is needed for the app shell.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Dealer Mitra</string>
+    <string name="title_activity_main">Dealer Mitra</string>
+    <string name="package_name">com.biobramha.dealermitra</string>
+    <string name="custom_url_scheme">com.biobramha.dealermitra</string>
+</resources>

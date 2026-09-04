@@ -1,0 +1,9 @@
+{
+  "appId": "com.biobramha.dealermitra",
+  "appName": "Dealer Mitra",
+  "webDir": "out",
+  "server": {
+    "cleartext": true,
+    "androidScheme": "https"
+  }
+}

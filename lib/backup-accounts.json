@@ -1,0 +1,18 @@
+{
+  "backup_timestamp": "2026-08-13T00:00:00.000Z",
+  "accounts": [
+    {
+      "phone": "8050946969",
+      "role": "super_admin",
+      "name": "Super Admin",
+      "updatedAt": "2026-08-18T00:00:00.000Z"
+    },
+    {
+      "phone": "7975158924",
+      "role": "warehouse",
+      "name": "Warehouse Manager",
+      "warehouseId": "wh-central",
+      "updatedAt": "2026-08-18T00:00:00.000Z"
+    }
+  ]
+}

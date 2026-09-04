@@ -1,0 +1,51 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:9.2.1'
+        classpath 'com.google.gms:google-services:4.4.4'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+apply from: "variables.gradle"
+
+// Redirect every module's build output (including capacitor-android, which Gradle
+// resolves from inside node_modules) to a path outside OneDrive. OneDrive's file
+// virtualisation/AV scanning intermittently locks files mid-delete inside synced
+// folders, which fails tasks like checkDebugAarMetadata with
+// "Unable to delete directory ...". Building outside the synced tree removes the
+// lock contention entirely rather than retrying around it.
+def externalBuildRoot = new File("C:/gradle-builds/bio-bramha")
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    buildDir = new File(externalBuildRoot, project.name)
+}
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
+                }
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

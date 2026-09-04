@@ -1,0 +1,49 @@
+# Environment variables
+.env*.local
+.env
+.env.development
+.env.production
+.env.production.apk
+!.env.example
+
+# Dependencies & Build artifacts
+node_modules
+.next/
+out/
+dist/
+build/
+tsconfig.tsbuildinfo
+*.log
+
+# Vercel & Sandbox
+.vercel/
+.vercel
+.snowflake/
+.v0-trash/
+__v0_*
+
+# Android & Gradle
+android/app/build/
+android/.gradle/
+android/build/
+*.apk
+*.aab
+
+# Local IDE & AI Agents
+.idea/
+.vscode/
+.agents/
+.kiro/
+scratch/
+screenshots/
+skills-lock.json
+
+# Operating System & Temp files
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+*.tmp
+
+android/app/release/
+*.lnk
