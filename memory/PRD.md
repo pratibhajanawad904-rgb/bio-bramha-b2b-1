@@ -57,3 +57,12 @@ improvements; apply specific business/UI corrections.
   order's still-available items, shows a toast, and opens the cart drawer (app-shell passes
   onOpenCart). Unavailable products are skipped with a message.
 - Verified: `next build` succeeds; tsc clean for all app code.
+
+## Iteration 3 (2026-06) — Mobile layout polish
+- Login gate (login-gate.tsx): replaced plain bg-slate-900 with emerald→slate gradient,
+  min-h-[100dvh], safe-area top/bottom padding, responsive card padding. Fixes "floating card
+  in black box" look on real phones.
+- AppShell root switched to min-h-[100dvh] so content respects Android bars.
+- Verified: next build succeeds; login renders correctly at 360px.
+- NOTE: "Could not send OTP" in the preview browser is expected — /api/auth/send-otp needs
+  MSG91+Supabase env keys and same-origin routing, available on Vercel/native, not preview.

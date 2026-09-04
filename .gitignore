@@ -47,3 +47,9 @@ desktop.ini
 
 android/app/release/
 *.lnk
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials

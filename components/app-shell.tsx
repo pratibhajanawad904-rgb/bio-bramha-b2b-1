@@ -27,7 +27,7 @@ export const AppShell: React.FC = () => {
   }, [currentUser.role])
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800 selection:bg-emerald-500 selection:text-white overflow-x-hidden">
+    <div className="min-h-[100dvh] bg-slate-50 flex flex-col font-sans text-slate-800 selection:bg-emerald-500 selection:text-white overflow-x-hidden">
       {/* Top Main Navigation Header */}
       <Header
         activeTab={activeTab}

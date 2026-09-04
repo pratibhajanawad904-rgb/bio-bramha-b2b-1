@@ -46,7 +46,7 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
 
   // Don't render SSR mismatch
   if (!mounted) {
-    return <div className="min-h-screen bg-slate-900" />
+    return <div className="min-h-[100dvh] bg-gradient-to-b from-emerald-900 via-slate-900 to-slate-950" />
   }
 
   // If user is authenticated, check if they need to give consent before accessing the app
@@ -160,8 +160,8 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 text-center space-y-6">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-emerald-900 via-slate-900 to-slate-950 flex items-center justify-center px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-center space-y-5 my-auto">
         
         <div className="flex justify-center">
           <div className="w-16 h-16 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30">
