@@ -15,11 +15,27 @@ import {
   Phone,
   Mail,
   HelpCircle,
-  Headphones
+  Headphones,
+  RotateCcw
 } from 'lucide-react'
 
-export const BuyerOrdersView: React.FC = () => {
-  const { orders, currentUser, helplineNumber, helplineEmail, updateOrderStatus } = useApp()
+export const BuyerOrdersView: React.FC<{ onOpenCart?: () => void }> = ({ onOpenCart }) => {
+  const { orders, currentUser, helplineNumber, helplineEmail, updateOrderStatus, addToCart, clearCart, products } = useApp()
+  const [reorderMsg, setReorderMsg] = useState<string | null>(null)
+
+  const handleReorder = (order: any) => {
+    const available = (order.items || []).filter((it: any) => products.some((p) => p.id === it.productId))
+    if (available.length === 0) {
+      setReorderMsg('These products are no longer available in the catalogue.')
+      setTimeout(() => setReorderMsg(null), 2500)
+      return
+    }
+    clearCart()
+    available.forEach((it: any) => addToCart(it.productId, it.qty || 1))
+    setReorderMsg('Items added to your cart!')
+    setTimeout(() => setReorderMsg(null), 2000)
+    if (onOpenCart) onOpenCart()
+  }
 
   // Order Detail Modal State
   const [selectedDetailOrderId, setSelectedDetailOrderId] = useState<string | null>(null)
@@ -81,6 +97,12 @@ export const BuyerOrdersView: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-12">
+      {reorderMsg && (
+        <div className="fixed bottom-24 md:bottom-6 right-4 sm:right-6 z-[60] bg-emerald-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-emerald-700" data-testid="reorder-toast">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+          <span className="text-sm font-semibold">{reorderMsg}</span>
+        </div>
+      )}
       {/* Top Navigation Sub-Tabs */}
       <div className="bg-white rounded-2xl p-2 border border-slate-200 shadow-xs flex items-center gap-2">
         <button
@@ -197,6 +219,15 @@ export const BuyerOrdersView: React.FC = () => {
                             <span>Cancel Order</span>
                           </button>
                         )}
+
+                        <button
+                          onClick={() => handleReorder(order)}
+                          data-testid={`reorder-btn-${order.id}`}
+                          className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Reorder</span>
+                        </button>
                       </div>
 
                       <a

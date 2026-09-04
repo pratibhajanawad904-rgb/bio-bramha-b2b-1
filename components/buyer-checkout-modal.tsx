@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useApp } from '@/lib/app-context'
-import { X, Truck, CheckCircle2, ShieldCheck, MapPin, Phone, Building, AlertCircle, Plus, Star, Loader2, Package } from 'lucide-react'
+import { X, Truck, CheckCircle2, ShieldCheck, MapPin, Phone, Building, AlertCircle, Plus, Star, Loader2, Package, Edit3 } from 'lucide-react'
 import { isValidPhoneNumber, isValidPincode } from '@/lib/security'
 import { fetchAppSettings } from '@/lib/settings-client'
 import { api } from '@/lib/api-client'
@@ -40,6 +40,8 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
   const [selectedAddressId, setSelectedAddressId] = useState<string>('new')
   const [saveForFuture, setSaveForFuture] = useState(true)
   const [loadingAddresses, setLoadingAddresses] = useState(false)
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
+  const [savingAddr, setSavingAddr] = useState(false)
 
   // Submission / success state
   const [isPlacing, setIsPlacing] = useState(false)
@@ -56,6 +58,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
     setValidationError(null)
     setPlacedOrder(null)
     setIsPlacing(false)
+    setEditingAddressId(null)
     setPhone(currentUser.phone || '')
 
     fetchAppSettings()
@@ -91,8 +94,59 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
 
   function chooseNewAddress() {
     setSelectedAddressId('new')
+    setEditingAddressId(null)
     setAddress(''); setCity(''); setPincode('')
     setSaveForFuture(true)
+  }
+
+  function startEditAddress(a: SavedAddress) {
+    setEditingAddressId(a.id)
+    setSelectedAddressId(a.id)
+    setAddress(a.line1)
+    setCity(a.city)
+    setPincode(a.pincode)
+    setValidationError(null)
+  }
+
+  function cancelEditAddress() {
+    setEditingAddressId(null)
+    const current = savedAddresses.find((a) => a.id === selectedAddressId)
+    if (current) applyAddress(current)
+    setValidationError(null)
+  }
+
+  async function handleUpdateAddress() {
+    const id = editingAddressId
+    if (!id) return
+    setValidationError(null)
+    if (!address || !city || !pincode) {
+      setValidationError('Please fill in all address fields.')
+      return
+    }
+    if (!isValidPincode(pincode)) {
+      setValidationError('Please enter a valid 6-digit pincode.')
+      return
+    }
+    setSavingAddr(true)
+    try {
+      const res = await api.updateAddress(id, { line1: address, city, pincode, state: 'MH' })
+      if (!res.success) {
+        setValidationError(res.error || 'Could not update the address.')
+        return
+      }
+      const r = await api.getAddresses()
+      if (r.success && Array.isArray(r.addresses)) {
+        const list = r.addresses as SavedAddress[]
+        setSavedAddresses(list)
+        const upd = list.find((a) => a.id === id)
+        if (upd) applyAddress(upd)
+      }
+      setEditingAddressId(null)
+    } catch {
+      setValidationError('Could not update the address. Please try again.')
+    } finally {
+      setSavingAddr(false)
+    }
   }
 
   if (!isOpen) return null
@@ -289,32 +343,44 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                 savedAddresses.length > 0 && (
                   <div className="space-y-2" data-testid="saved-addresses-list">
                     {savedAddresses.map((a) => (
-                      <label
+                      <div
                         key={a.id}
                         data-testid={`saved-address-${a.id}`}
-                        className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                          selectedAddressId === a.id
+                        className={`flex items-start gap-2 p-3 rounded-xl border transition-all ${
+                          selectedAddressId === a.id && !editingAddressId
                             ? 'border-emerald-600 bg-emerald-50/70'
-                            : 'border-slate-200 bg-white hover:bg-slate-50'
+                            : 'border-slate-200 bg-white'
                         }`}
                       >
-                        <input
-                          type="radio"
-                          name="savedAddress"
-                          checked={selectedAddressId === a.id}
-                          onChange={() => applyAddress(a)}
-                          className="accent-emerald-600 w-4 h-4 mt-0.5 shrink-0"
-                        />
-                        <div className="text-xs text-slate-700 min-w-0">
-                          <p className="font-semibold text-slate-900 truncate">{a.line1}</p>
-                          <p>{a.city} - {a.pincode}</p>
-                          {a.isDefault && (
-                            <span className="inline-flex items-center gap-1 text-emerald-700 font-bold mt-0.5">
-                              <Star className="w-3 h-3" /> Default
-                            </span>
-                          )}
-                        </div>
-                      </label>
+                        <label className="flex items-start gap-3 cursor-pointer flex-1 min-w-0">
+                          <input
+                            type="radio"
+                            name="savedAddress"
+                            checked={selectedAddressId === a.id && !editingAddressId}
+                            onChange={() => { setEditingAddressId(null); applyAddress(a) }}
+                            className="accent-emerald-600 w-4 h-4 mt-0.5 shrink-0"
+                          />
+                          <div className="text-xs text-slate-700 min-w-0">
+                            <p className="font-semibold text-slate-900 truncate">{a.line1}</p>
+                            <p>{a.city} - {a.pincode}</p>
+                            {a.isDefault && (
+                              <span className="inline-flex items-center gap-1 text-emerald-700 font-bold mt-0.5">
+                                <Star className="w-3 h-3" /> Default
+                              </span>
+                            )}
+                          </div>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => startEditAddress(a)}
+                          data-testid={`edit-address-${a.id}`}
+                          className="shrink-0 w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer"
+                          aria-label="Edit address"
+                          title="Edit address"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                      </div>
                     ))}
 
                     <button
@@ -333,9 +399,12 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                 )
               )}
 
-              {/* Address form (shown for new address, or when there are none saved yet) */}
-              {(selectedAddressId === 'new' || savedAddresses.length === 0) && (
+              {/* Address form (new address, editing a saved one, or none saved yet) */}
+              {(selectedAddressId === 'new' || savedAddresses.length === 0 || editingAddressId) && (
                 <div className="space-y-3" data-testid="address-form">
+                  {editingAddressId && (
+                    <p className="text-xs font-bold text-emerald-700">Editing saved address</p>
+                  )}
                   <div>
                     <label className="text-xs font-semibold text-slate-700 block mb-1">Full Street Address</label>
                     <input
@@ -379,16 +448,39 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                     </div>
                   </div>
 
-                  <label className="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={saveForFuture}
-                      onChange={(e) => setSaveForFuture(e.target.checked)}
-                      data-testid="save-address-checkbox"
-                      className="accent-emerald-600 w-4 h-4"
-                    />
-                    Save this address for future orders
-                  </label>
+                  {editingAddressId ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleUpdateAddress}
+                        disabled={savingAddr}
+                        data-testid="update-address-btn"
+                        className="flex-1 min-h-[42px] py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        {savingAddr ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                        Update Address
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelEditAddress}
+                        data-testid="cancel-edit-address-btn"
+                        className="min-h-[42px] px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={saveForFuture}
+                        onChange={(e) => setSaveForFuture(e.target.checked)}
+                        data-testid="save-address-checkbox"
+                        className="accent-emerald-600 w-4 h-4"
+                      />
+                      Save this address for future orders
+                    </label>
+                  )}
                 </div>
               )}
 
@@ -526,7 +618,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
 
               <button
                 type="submit"
-                disabled={isPlacing}
+                disabled={isPlacing || !!editingAddressId}
                 data-testid="place-order-btn"
                 className="w-full min-h-[50px] py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >

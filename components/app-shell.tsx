@@ -38,7 +38,7 @@ export const AppShell: React.FC = () => {
       {/* Main Page Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 pb-24 md:pb-12">
         {activeTab === 'catalog' && <ProductCatalog />}
-        {activeTab === 'my-orders' && <BuyerOrdersView />}
+        {activeTab === 'my-orders' && <BuyerOrdersView onOpenCart={() => setIsCartOpen(true)} />}
         {activeTab === 'warehouse' && <WarehouseDashboard />}
         {activeTab === 'admin' && <AdminDashboard />}
         {activeTab === 'profile' && <ProfilePage />}

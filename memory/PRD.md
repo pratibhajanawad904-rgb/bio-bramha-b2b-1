@@ -48,3 +48,12 @@ improvements; apply specific business/UI corrections.
 ## Backlog / Next
 - Admin: set real support phone/UPI/QR from Admin dashboard (already supported).
 - Optional: address edit-in-checkout, delivery-state selector.
+
+## Iteration 2 (2026-06)
+- Address Editing in checkout: each saved address has an Edit (pencil) action; opens the form
+  pre-filled with Update/Cancel; persists via PATCH /api/account/address and reloads.
+  Place Order is disabled while an address edit is unsaved.
+- Reorder: each past order in My Orders has a "Reorder" button — clears the cart, re-adds the
+  order's still-available items, shows a toast, and opens the cart drawer (app-shell passes
+  onOpenCart). Unavailable products are skipped with a message.
+- Verified: `next build` succeeds; tsc clean for all app code.
