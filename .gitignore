@@ -49,6 +49,8 @@ android/app/release/
 *.lnk
 .env.*
 *.env
+!.env.example
+!.env.production.apk.example
 credentials.json
 *.pem
 *.key

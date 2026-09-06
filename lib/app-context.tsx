@@ -347,6 +347,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         timeline: Array.isArray(o.timeline) ? o.timeline : []
       }))
 
+      const placedAt = (o: Order): number => {
+        const stamp = o.timeline?.[0]?.timestamp
+        const t = stamp ? Date.parse(stamp) : NaN
+        return Number.isFinite(t) ? t : 0
+      }
+      // The orders table has no created_at; sort newest first by order date, then placed time.
+      mapped.sort((a, b) => (b.date || '').localeCompare(a.date || '') || placedAt(b) - placedAt(a))
+
       setOrders(mapped)
       localStorage.setItem('bb_orders', JSON.stringify(mapped))
     } catch (e) {

@@ -50,6 +50,10 @@ async function apiCall<T = any>(
     // Native: use CapacitorHttp to bypass CORS (the Capacitor webview's origin
     // differs from the Vercel deployment, so browser fetch would be blocked).
     if (isNativeApp()) {
+      if (!API_BASE || /localhost|127\.0\.0\.1/.test(API_BASE)) {
+        console.error('[api] NEXT_PUBLIC_API_BASE_URL is missing or points to localhost; the Android build must use the live server URL.')
+        return { success: false, error: 'App is not connected to the live server. Please update the app.' } as ApiResponse<T>
+      }
       const res = await CapacitorHttp.request({
         url,
         method,

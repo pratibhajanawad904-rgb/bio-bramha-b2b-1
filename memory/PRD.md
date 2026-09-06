@@ -34,6 +34,12 @@ remove "Modes", Capacitor Android safe areas/keyboard, preserve admin + security
 - verify-otp now distinguishes MSG91 auth-key/config errors from wrong code (was all "Invalid OTP")
 - NOTE: in this preview the ingress sends /api/* to port 8001, so a tiny node proxy 8001->3000 (/tmp/proxy8001.js) is needed for browser testing
 
+## Order-flow fix session (2026-06)
+- Root cause of "cannot place order" on Android: static APK built without NEXT_PUBLIC_API_BASE_URL -> /api calls hit capacitor origin. build-apk.mjs now refuses to build without a live https URL; api-client returns a clear error on native if missing; .env.production.apk.example added
+- Web flow verified in browser with live session: Add to Cart -> Cart -> Checkout -> Place Order (ORD-123425, ₹450) -> success panel -> View My Orders shows it first (then cancelled as test)
+- Orders now sorted newest first (table has no created_at: sort by date, then placed timestamp)
+- Restored truncated product images (azospirillum.png / -field.png were cut at 512KB/1MB in last commit) from initial import
+
 ## Verification
 - `next build` OK, `tsc --noEmit` 0 errors (excluding reference design-components/)
 - Testing agent iteration_1: 11/12 pass; the 1 crash (order detail without timeline) fixed and re-verified

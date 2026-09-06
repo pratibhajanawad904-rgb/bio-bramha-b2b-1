@@ -8,9 +8,9 @@
  *
  * The app/api routes are moved aside for the duration of the export. `output: 'export'`
  * rejects dynamic route handlers, while the Vercel deployment needs those same handlers
- * to be dynamic, and `export const dynamic` cannot be conditional. The Android app never
- * calls /api (it uses native HTTP to MSG91 and talks to Supabase directly), so excluding
- * the routes from this build is the honest resolution rather than crippling them for web.
+ * to be dynamic, and `export const dynamic` cannot be conditional. The Android app calls
+ * the LIVE server's /api routes via CapacitorHttp (NEXT_PUBLIC_API_BASE_URL), so the
+ * route source files are not needed inside the static bundle.
  *
  * Usage: npm run build:apk
  */
@@ -101,6 +101,18 @@ let exitCode = 0
 
 try {
   const apkEnv = loadApkEnv()
+
+  // The APK is a static bundle: every /api call must go to the live server. Building
+  // without this (or with localhost) produces an app that cannot log in or place orders.
+  const apiBase = String(apkEnv.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || '').trim()
+  if (!/^https:\/\//.test(apiBase) || /localhost|127\.0\.0\.1/.test(apiBase)) {
+    throw new Error(
+      `NEXT_PUBLIC_API_BASE_URL must be the live https server URL (e.g. https://your-app.vercel.app). ` +
+      `Got: "${apiBase || '(empty)'}". Set it in ${APK_ENV_FILE} (see ${APK_ENV_FILE}.example).`
+    )
+  }
+  apkEnv.NEXT_PUBLIC_API_BASE_URL = apiBase.replace(/\/+$/, '')
+  console.log(`\nAndroid API base: ${apkEnv.NEXT_PUBLIC_API_BASE_URL}`)
 
   // 1. Static export for the APK shell, without the API routes.
   stashApiRoutes()
