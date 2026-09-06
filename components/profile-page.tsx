@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { api } from '@/lib/api-client'
 import { useApp } from '@/lib/app-context'
+import { STATE_OPTIONS, stateName } from '@/lib/data'
 
 interface Address {
   id: string
@@ -279,7 +280,7 @@ export const ProfilePage: React.FC = () => {
                 <div className="text-xs text-slate-700 space-y-0.5 min-w-0">
                   <p className="font-medium text-slate-900 break-words">{addr.line1}</p>
                   <p className="text-slate-600">
-                    {addr.city}, {addr.state || 'MH'} &bull; <span className="font-bold text-slate-800">PIN: {addr.pincode}</span>
+                    {addr.city}, {stateName(addr.state)} &bull; <span className="font-bold text-slate-800">PIN: {addr.pincode}</span>
                   </p>
                   {addr.isDefault && (
                     <span className="inline-flex items-center gap-1 text-emerald-700 font-bold mt-1">
@@ -348,10 +349,9 @@ export const ProfilePage: React.FC = () => {
                   data-testid="profile-address-state-select"
                   className="w-full min-w-0 px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white text-slate-900"
                 >
-                  <option value="MH">Maharashtra</option>
-                  <option value="AP">Andhra Pradesh</option>
-                  <option value="TS">Telangana</option>
-                  <option value="KA">Karnataka</option>
+                  {STATE_OPTIONS.map((s) => (
+                    <option key={s.code} value={s.code}>{s.name}</option>
+                  ))}
                 </select>
               </div>
               <div>

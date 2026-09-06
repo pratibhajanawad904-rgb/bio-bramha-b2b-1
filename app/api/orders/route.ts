@@ -176,7 +176,7 @@ export async function POST(request: Request) {
     const productIds = items.map((i: any) => String(i?.productId || '')).filter(Boolean)
     const { data: products, error: productError } = await supabaseAdmin
       .from('products')
-      .select('id, name, price, image, main_category, moq')
+      .select('id, name, price, image, main_category, moq, stock')
       .in('id', productIds)
 
     if (productError) {
@@ -207,6 +207,10 @@ export async function POST(request: Request) {
       if (!Number.isFinite(qty) || qty < 1) return badRequest(`Invalid quantity for ${product.name}.`)
 
       // MVP V1: minimum order quantity is 1 unit for every product (no bulk MOQ).
+      const stock = Number(product.stock)
+      if (Number.isFinite(stock) && stock < qty) {
+        return badRequest(stock <= 0 ? `${product.name} is currently out of stock.` : `Only ${stock} unit(s) of ${product.name} available right now.`)
+      }
 
       resolvedItems.push({
         productId: product.id,

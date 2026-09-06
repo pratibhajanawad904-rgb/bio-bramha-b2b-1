@@ -26,6 +26,14 @@ remove "Modes", Capacitor Android safe areas/keyboard, preserve admin + security
 - Security: removed hard-coded MSG91 auth key/template from client bundle; native OTP send/verify now go through server /api/auth routes; DEPLOYMENT.md scrubbed. ACTION: rotate MSG91 key (was in git history)
 - Order detail modal null-guards timeline/items
 
+## Live verification (2026-06, with real Supabase + MSG91 keys in /app/.env.local, gitignored)
+- send-otp -> MSG91 OK; verify-otp with real code -> session issued (user 8618734070 "Pratibha", buyer)
+- /api/orders GET: 37 orders, all buyer_id user-8618734070 (isolation OK); anon REST on orders/user_accounts/user_addresses -> 42501 denied (RLS OK)
+- Address add / set default / delete OK; order placed (MOQ 1, total 620) -> visible -> cancelled; over-stock rejected (new server stock guard)
+- UI with real session: 38 orders, Reorder at current price, default address auto-selected, Taloja shown, support tel:9321319432 (admin-configured)
+- verify-otp now distinguishes MSG91 auth-key/config errors from wrong code (was all "Invalid OTP")
+- NOTE: in this preview the ingress sends /api/* to port 8001, so a tiny node proxy 8001->3000 (/tmp/proxy8001.js) is needed for browser testing
+
 ## Verification
 - `next build` OK, `tsc --noEmit` 0 errors (excluding reference design-components/)
 - Testing agent iteration_1: 11/12 pass; the 1 crash (order detail without timeline) fixed and re-verified

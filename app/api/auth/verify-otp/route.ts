@@ -77,7 +77,28 @@ export async function POST(request: Request) {
       isVerified = data.type === 'success' || msg.includes('success') || msg.includes('already verified')
 
       if (!isVerified) {
-        console.warn(`[verify-otp] rejected for ${maskPhone(cleanedPhone)}: ${data.message || 'unknown reason'}`)
+        console.warn(`[verify-otp] rejected for ${maskPhone(cleanedPhone)}: ${data.message || resText.slice(0, 200) || 'unknown reason'}`)
+
+        // Configuration problems must not masquerade as a wrong code.
+        if (msg.includes('authkey') || msg.includes('unauthori') || msg.includes('ip not') || response.status === 401 || response.status === 403) {
+          console.error('[verify-otp] MSG91 rejected the server auth key. Check MSG91_AUTH_KEY on the server.')
+          return NextResponse.json(
+            { success: false, verified: false, error: 'OTP service is not configured correctly. Please contact support.' },
+            { status: 502 }
+          )
+        }
+        if (msg.includes('expire')) {
+          return NextResponse.json(
+            { success: false, verified: false, error: 'This OTP has expired. Please request a new one.' },
+            { status: 400 }
+          )
+        }
+        if (msg.includes('retry') || msg.includes('attempt') || msg.includes('limit')) {
+          return NextResponse.json(
+            { success: false, verified: false, error: 'Too many attempts for this OTP. Please request a new one.' },
+            { status: 429 }
+          )
+        }
       }
     } catch (e) {
       console.error(`[verify-otp] MSG91 unreachable for ${maskPhone(cleanedPhone)}:`, e)

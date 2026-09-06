@@ -6,7 +6,7 @@ import { X, Truck, CheckCircle2, ShieldCheck, MapPin, Phone, Building, AlertCirc
 import { isValidPhoneNumber, isValidPincode } from '@/lib/security'
 import { fetchAppSettings } from '@/lib/settings-client'
 import { api } from '@/lib/api-client'
-import { DEFAULT_WAREHOUSE_LOCATION } from '@/lib/data'
+import { DEFAULT_WAREHOUSE_LOCATION, STATE_OPTIONS, normalizeStateCode, stateName } from '@/lib/data'
 
 interface CheckoutModalProps {
   isOpen: boolean
@@ -91,7 +91,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
     setAddress(a.line1)
     setCity(a.city)
     setPincode(a.pincode)
-    setAddrState(a.state || 'MH')
+    setAddrState(normalizeStateCode(a.state))
   }
 
   function chooseNewAddress() {
@@ -107,7 +107,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
     setAddress(a.line1)
     setCity(a.city)
     setPincode(a.pincode)
-    setAddrState(a.state || 'MH')
+    setAddrState(normalizeStateCode(a.state))
     setValidationError(null)
   }
 
@@ -381,7 +381,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                           />
                           <div className="text-xs text-slate-700 min-w-0">
                             <p className="font-semibold text-slate-900 break-words">{a.line1}</p>
-                            <p>{a.city}, {a.state || 'MH'} - {a.pincode}</p>
+                            <p>{a.city}, {stateName(a.state)} - {a.pincode}</p>
                             <div className="flex flex-wrap gap-1.5 mt-1">
                               {a.isDefault && (
                                 <span className="inline-flex items-center gap-1 text-emerald-700 font-bold bg-emerald-100 px-1.5 py-0.5 rounded" data-testid={`default-badge-${a.id}`}>
@@ -501,10 +501,9 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                         data-testid="checkout-state-select"
                         className="w-full min-w-0 px-3.5 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900"
                       >
-                        <option value="MH">Maharashtra</option>
-                        <option value="AP">Andhra Pradesh</option>
-                        <option value="TS">Telangana</option>
-                        <option value="KA">Karnataka</option>
+                        {STATE_OPTIONS.map((s) => (
+                          <option key={s.code} value={s.code}>{s.name}</option>
+                        ))}
                       </select>
                     </div>
                     <div>

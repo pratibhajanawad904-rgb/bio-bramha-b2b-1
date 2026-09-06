@@ -1,6 +1,25 @@
 export type Role = 'super_admin' | 'admin' | 'warehouse' | 'buyer'
 export type IndianState = 'AP' | 'TS' | 'KA' | 'MH'
 
+export const STATE_OPTIONS: { code: IndianState; name: string }[] = [
+  { code: 'MH', name: 'Maharashtra' },
+  { code: 'AP', name: 'Andhra Pradesh' },
+  { code: 'TS', name: 'Telangana' },
+  { code: 'KA', name: 'Karnataka' }
+]
+
+/** Accepts 'MH' or 'Maharashtra' (any case) and returns the 2-letter code; defaults to MH. */
+export function normalizeStateCode(value: string | null | undefined): IndianState {
+  const v = String(value || '').trim().toLowerCase()
+  const hit = STATE_OPTIONS.find((s) => s.code.toLowerCase() === v || s.name.toLowerCase() === v)
+  return hit ? hit.code : 'MH'
+}
+
+export function stateName(value: string | null | undefined): string {
+  const code = normalizeStateCode(value)
+  return STATE_OPTIONS.find((s) => s.code === code)?.name || code
+}
+
 export type CartItem = {
   productId: string
   quantity: number
