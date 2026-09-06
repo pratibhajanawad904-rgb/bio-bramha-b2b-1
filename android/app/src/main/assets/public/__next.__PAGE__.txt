@@ -1,0 +1,23 @@
+1:"$Sreact.fragment"
+2:I[92834,["/_next/static/chunks/1ev8c16geqy6k.js","/_next/static/chunks/1gdxtq_2mrs1y.js","/_next/static/chunks/0dpaihn4yw55f.js"],"AppProvider"]
+3:I[5215,["/_next/static/chunks/1ev8c16geqy6k.js","/_next/static/chunks/1gdxtq_2mrs1y.js","/_next/static/chunks/0dpaihn4yw55f.js"],"LoginGate"]
+4:I[48026,["/_next/static/chunks/1ev8c16geqy6k.js","/_next/static/chunks/1gdxtq_2mrs1y.js","/_next/static/chunks/0dpaihn4yw55f.js"],"AppShell"]
+5:I[97367,["/_next/static/chunks/1ev8c16geqy6k.js"],"OutletBoundary"]
+6:"$Sreact.suspense"
+a:I[97367,["/_next/static/chunks/1ev8c16geqy6k.js"],"ViewportBoundary"]
+b:I[97367,["/_next/static/chunks/1ev8c16geqy6k.js"],"MetadataBoundary"]
+d:I[39756,["/_next/static/chunks/1ev8c16geqy6k.js"],"default"]
+e:I[8821,["/_next/static/chunks/1ev8c16geqy6k.js","/_next/static/chunks/3qaaoygymb0fz.js"],"default"]
+f:I[37457,["/_next/static/chunks/1ev8c16geqy6k.js"],"default"]
+10:I[2355,["/_next/static/chunks/1ev8c16geqy6k.js"],"Analytics"]
+:HL["/_next/static/chunks/3k118de7_bdzp.css","style"]
+9:X
+0:{"buildId":"KAAgSXPVYz7LxAY1d6305","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"children":["$","$L3",null,{"children":["$","$L4",null,{}]}]}],[["$","script","script-0",{"src":"/_next/static/chunks/1gdxtq_2mrs1y.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/0dpaihn4yw55f.js","async":true}]],["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]]}],"isPartial":"$@8","staleTime":"$9","varyParams":null},{"rsc":["$","$1","h",{"children":[null,["$","$La",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover"}],["$","meta","2",{"name":"theme-color","content":"#059669"}],["$","meta","3",{"name":"color-scheme","content":"light"}]]}],["$","div",null,{"hidden":true,"children":["$","$Lb",null,{"children":["$","$6",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Bio-Bramha Dealer Mitra | B2B Bio-Inputs Platform"}],["$","meta","1",{"name":"description","content":"South India's trusted B2B platform for bio-fertilizers, biopesticides, and growth promoters. Serving Dealers, Retailers & VLEs across Andhra Pradesh, Telangana, Karnataka, and Maharashtra."}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isPartial":"$@c","staleTime":"$9","varyParams":null},{"rsc":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/3k118de7_bdzp.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/1ev8c16geqy6k.js","async":true}]],["$","html",null,{"lang":"en","className":"bg-background","children":["$","body",null,{"className":"antialiased font-sans overflow-x-hidden","children":[["$","$Ld",null,{"parallelRouterKey":"children","error":"$e","errorStyles":[],"errorScripts":[["$","script","script-0",{"src":"/_next/static/chunks/3qaaoygymb0fz.js","async":true}]],"template":["$","$Lf",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}],["$","$L10",null,{}]]}]}]]}],"isPartial":"$@11","staleTime":"$9","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@12","rootVaryParams":null,"needsRuntimeRequest":"$@13"}
+7:null
+9:300
+13:true
+9:C
+12:0
+c:"$undefined"
+11:"$undefined"
+8:"$undefined"

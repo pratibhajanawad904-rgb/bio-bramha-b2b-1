@@ -1,5 +1,14 @@
 apply plugin: 'com.android.application'
 
+// Optional release signing: copy android/keystore.properties.example to
+// android/keystore.properties and fill in your existing Play upload keystore details.
+// The file is git-ignored. Without it, sign via Android Studio's "Generate Signed Bundle".
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+
 android {
     namespace = "com.biobramha.dealermitra"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,25 +16,8 @@ android {
         applicationId "com.biobramha.dealermitra"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 19
-        versionName "19.0.0"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        versionCode 20
+        versionName "20.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -34,8 +26,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            release {
+                storeFile rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
             // Obfuscate and strip unused code so the shipped APK is harder to reverse
             // engineer, and so unreferenced classes are not left in the bundle.
             minifyEnabled true

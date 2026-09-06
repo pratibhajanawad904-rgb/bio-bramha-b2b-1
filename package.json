@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "build:apk": "node scripts/build-apk.mjs",
+    "build:aab": "node scripts/build-apk.mjs --aab",
+    "android:sync": "node scripts/build-apk.mjs --sync",
     "start": "next start",
     "lint": "eslint ."
   },

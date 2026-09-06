@@ -3,7 +3,6 @@
 .env
 .env.development
 .env.production
-.env.production.apk
 !.env.example
 
 # Dependencies & Build artifacts
@@ -51,7 +50,13 @@ android/app/release/
 *.env
 !.env.example
 !.env.production.apk.example
+!.env.production.apk
 credentials.json
 *.pem
 *.key
 .credentials
+
+# Android release signing (never commit)
+android/keystore.properties
+*.jks
+*.keystore

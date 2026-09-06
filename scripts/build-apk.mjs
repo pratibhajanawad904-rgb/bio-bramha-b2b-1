@@ -20,6 +20,13 @@ import { join } from 'node:path'
 
 const isWindows = process.platform === 'win32'
 
+// `npm run build:apk`            -> debug APK for testing on a phone
+// `npm run build:aab`            -> signed release .aab for Google Play (bundleRelease)
+// `npm run build:apk -- --sync`  -> only export web assets + cap sync (then open in Android Studio)
+const args = process.argv.slice(2)
+const wantAab = args.includes('--aab')
+const syncOnly = args.includes('--sync')
+
 const API_DIR = join('app', 'api')
 const API_STASH = join('app', '_api_stashed_for_apk_build')
 const APK_ENV_FILE = '.env.production.apk'
@@ -142,6 +149,25 @@ try {
     } catch (e) {
       console.warn(`\nCould not clear ${staleAssets}: ${e.message}`)
     }
+  }
+
+  if (syncOnly) {
+    console.log('\nWeb assets exported and synced into android/. Open the android/ folder in Android Studio and use Build > Generate Signed Bundle / APK.')
+    process.exit(0)
+  }
+
+  if (wantAab) {
+    // 4b. Release bundle for Google Play. Signing comes from android/keystore.properties
+    //     (see android/keystore.properties.example) or Android Studio's signing wizard.
+    run(isWindows ? 'gradlew.bat' : './gradlew', ['bundleRelease'], { cwd: 'android' })
+    const externalAab = 'C:/gradle-builds/bio-bramha/app/outputs/bundle/release/app-release.aab'
+    const conventionalAab = join('android', 'app', 'build', 'outputs', 'bundle', 'release', 'app-release.aab')
+    if (existsSync(externalAab)) {
+      mkdirSync(join('android', 'app', 'build', 'outputs', 'bundle', 'release'), { recursive: true })
+      copyFileSync(externalAab, conventionalAab)
+    }
+    console.log(`\nDone. Release bundle at:\n  - ${existsSync(externalAab) ? externalAab : conventionalAab}`)
+    process.exit(0)
   }
 
   // 4. Assemble the debug APK.

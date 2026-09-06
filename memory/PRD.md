@@ -44,6 +44,13 @@ remove "Modes", Capacitor Android safe areas/keyboard, preserve admin + security
 - Live site bundle (bio-bramha-b2b-1-git-main-pratibha-projects.vercel.app) contains NEXT_PUBLIC_SUPABASE_URL=https://rmyvftmmcoultlvipmjyw.supabase.co (typo: "tl"); real project is rmyvftmmcoulhvipmjyw. Host does not resolve -> every server DB call fails -> "Could not create the order.", OTP verify says isNewUser for existing users.
 - Fix is in Vercel env vars (correct URL, redeploy). Added /api/health self-check (no secrets) + clearer order error messages.
 
+## Android release prep (2026-06)
+- .env.production.apk (public NEXT_PUBLIC_* only, now tracked) -> API base https://bio-bramha-b2b-1-git-main-pratibha-projects.vercel.app
+- versionCode 20 / 20.0.0; optional keystore.properties signing (user keeps existing Play upload key; none generated)
+- Static export + cap sync done: android/app/src/main/assets/public now tracked (22MB) so android/ opens in Android Studio directly
+- Scripts: npm run android:sync (export+sync), npm run build:aab (bundleRelease), build:apk (debug). Node >=22 needed for Capacitor CLI
+- ANDROID_RELEASE.md documents steps. No Java/Android SDK in this container: .aab must be built by user in Android Studio
+
 ## Verification
 - `next build` OK, `tsc --noEmit` 0 errors (excluding reference design-components/)
 - Testing agent iteration_1: 11/12 pass; the 1 crash (order detail without timeline) fixed and re-verified
