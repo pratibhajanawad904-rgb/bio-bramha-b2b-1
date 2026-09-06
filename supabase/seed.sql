@@ -28,7 +28,7 @@ values
    array['/products/azospirillum.png','/products/azospirillum-field.png'],
    150, 'Best Seller',
    '{"dosage":"1 Litre / Acre","shelfLife":"12 Months","description":"Nitrogen-fixing liquid bio-fertilizer.","howToUse":["Mix with water and apply to soil."],"targetCrops":["Paddy","Sugarcane"],"certification":["NPOP Certified Organic Input"],"composition":"Azospirillum brasilense broth"}'::jsonb,
-   'bulk', array['cat-bio-fertilizer'], 20),
+   'bulk', array['cat-bio-fertilizer'], 1),
 
   ('prod-psb', 'PSB Phosphate Solubilizer',
    'Bacillus megaterium var. phosphaticum', 'Bio-Fertilizer',
@@ -38,7 +38,7 @@ values
    array['/products/psb.png','/products/psb-field.png'],
    180, 'Eco-Friendly',
    '{"dosage":"1 Litre / Acre","shelfLife":"12 Months","description":"Phosphate solubilizing bacteria.","howToUse":["Apply via fertigation."],"targetCrops":["Groundnut","Pulses"],"certification":["FCO Compliant"],"composition":"Bacillus megaterium culture"}'::jsonb,
-   'bulk', array['cat-bio-fertilizer'], 20),
+   'bulk', array['cat-bio-fertilizer'], 1),
 
   ('prod-neem', 'Neem-Care Pure Biopesticide',
    'Cold-pressed Azadirachtin (10000 PPM)', 'Biopesticide',
@@ -58,7 +58,7 @@ values
    array['/products/trichoderma.png','/products/trichoderma-field.png'],
    110, 'Soil Health',
    '{"dosage":"2 kg / Acre","shelfLife":"12 Months","description":"Antagonistic bio-control fungus.","howToUse":["Mix with farmyard manure."],"targetCrops":["Chilli","Spices"],"certification":["CIB and RC Registered"],"composition":"Trichoderma viride talc"}'::jsonb,
-   'bulk', array['cat-biopesticide'], 20),
+   'bulk', array['cat-biopesticide'], 1),
 
   ('prod-seaweed', 'Seaweed Bio-Extract Growth Booster',
    'Ascophyllum nodosum marine extract', 'Growth Promoter',
@@ -85,7 +85,7 @@ on conflict (id) do nothing;
 -- these rows make the admin roster render correctly on a fresh database.
 insert into public.user_accounts (phone, name, role, assigned_warehouse_id) values
   ('8050946969', 'Super Admin',       'super_admin', null),
-  ('7975158924', 'Warehouse Manager', 'warehouse',   'wh-central')
+  ('7975158924', 'Warehouse Manager', 'warehouse',   'wh-taloja')
 on conflict (phone) do nothing;
 
 -- Support contact and payment instructions shown at checkout.

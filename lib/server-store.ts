@@ -26,7 +26,7 @@ const globalRolesMap = new Map<string, ServerUserRole>([
       phone: '7975158924',
       role: 'warehouse',
       name: 'Warehouse Manager',
-      warehouseId: 'wh-central',
+      warehouseId: 'wh-taloja',
       updatedAt: new Date().toISOString()
     }
   ]
@@ -58,7 +58,7 @@ export function assignServerRole(
     phone: cleanPhone,
     role: role,
     name: name || existing?.name || `User ${cleanPhone}`,
-    warehouseId: warehouseId || existing?.warehouseId || 'wh-central',
+    warehouseId: warehouseId || existing?.warehouseId || 'wh-taloja',
     updatedAt: new Date().toISOString()
   }
 
@@ -82,7 +82,7 @@ export function transferServerSuperAdmin(targetPhone: string, targetName?: strin
     phone: cleanTargetPhone,
     role: 'super_admin',
     name: targetName || existing?.name || `Super Admin`,
-    warehouseId: existing?.warehouseId || 'wh-central',
+    warehouseId: existing?.warehouseId || 'wh-taloja',
     updatedAt: new Date().toISOString()
   })
 

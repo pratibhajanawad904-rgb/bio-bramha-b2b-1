@@ -7,7 +7,7 @@ import { issueSessionToken } from '@/lib/session'
 // routes existing accounts straight to login), so the seed applies at most once.
 const PREPROVISIONED_ACCOUNTS: Record<string, { name: string; role: 'super_admin' | 'warehouse'; assignedWarehouseId?: string }> = {
   '8050946969': { name: 'Super Admin', role: 'super_admin' },
-  '7975158924': { name: 'Warehouse Manager', role: 'warehouse', assignedWarehouseId: 'wh-central' }
+  '7975158924': { name: 'Warehouse Manager', role: 'warehouse', assignedWarehouseId: 'wh-taloja' }
 }
 
 export async function POST(request: Request) {
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
         role: assignedRole,
         is_deleted: false,
         deleted_at: null,
-        assigned_warehouse_id: preprovisioned?.assignedWarehouseId || (isReRegistration ? null : userRow?.assigned_warehouse_id) || (assignedRole === 'warehouse' ? 'wh-central' : null),
+        assigned_warehouse_id: preprovisioned?.assignedWarehouseId || (isReRegistration ? null : userRow?.assigned_warehouse_id) || (assignedRole === 'warehouse' ? 'wh-taloja' : null),
         updated_at: new Date().toISOString()
       }, { onConflict: 'phone' })
       .select('*')

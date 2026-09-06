@@ -22,7 +22,7 @@ export interface ResolvedRole {
  */
 export const PREPROVISIONED_ACCOUNTS: Record<string, { name: string; role: AppRole; assignedWarehouseId?: string }> = {
   '8050946969': { name: 'Super Admin', role: 'super_admin' },
-  '7975158924': { name: 'Warehouse Manager', role: 'warehouse', assignedWarehouseId: 'wh-central' }
+  '7975158924': { name: 'Warehouse Manager', role: 'warehouse', assignedWarehouseId: 'wh-taloja' }
 }
 
 export function normalizePhone(phone: string): string {

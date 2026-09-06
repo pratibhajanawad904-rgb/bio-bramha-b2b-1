@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         phone: '7975158924',
         role: 'warehouse',
         name: 'Warehouse Manager',
-        assigned_warehouse_id: 'wh-central'
+        assigned_warehouse_id: 'wh-taloja'
       }
     ]
 

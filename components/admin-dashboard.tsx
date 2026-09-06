@@ -2,34 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useApp } from '@/lib/app-context'
-import {
-  ShieldCheck,
-  Tag,
-  Users,
-  Plus,
-  Trash2,
-  CheckCircle2,
-  Warehouse,
-  User,
-  Sparkles,
-  Percent,
-  CheckSquare,
-  Square,
-  Package,
-  PlusCircle,
-  Image as ImageIcon,
-  Upload,
-  PhoneCall,
-  AlertCircle,
-  MessageSquareCheck,
-  Send,
-  Save,
-  X,
-  Mail,
-  Crown,
-  ArrowRight,
-  Eye
-} from 'lucide-react'
+import { ShieldCheck, Tag, Users, Plus, Trash2, CircleCheck as CheckCircle2, Warehouse, User, Sparkles, Percent, SquareCheck as CheckSquare, Square, Package, CirclePlus as PlusCircle, Image as ImageIcon, Upload, PhoneCall, CircleAlert as AlertCircle, MessageSquareCheck, Send, Save, X, Mail, Crown, ArrowRight, Eye } from 'lucide-react'
 import { MainCategory, Role, UserAccount } from '@/lib/data'
 import { RoleChangeConfirmationModal, RoleChangeRequest } from './role-change-confirmation-modal'
 import { fetchAppSettings, saveAppSettings } from '@/lib/settings-client'
@@ -65,7 +38,7 @@ export const AdminDashboard: React.FC = () => {
   const [assignPhoneInput, setAssignPhoneInput] = useState('')
   const [assignNameInput, setAssignNameInput] = useState('')
   const [assignRoleInput, setAssignRoleInput] = useState<Role>('admin')
-  const [assignWhInput, setAssignWhInput] = useState<string>(warehouses[0]?.id || 'wh-central')
+  const [assignWhInput, setAssignWhInput] = useState<string>(warehouses[0]?.id || 'wh-taloja')
   const [roleFormNotice, setRoleFormNotice] = useState<string | null>(null)
   const [roleFormError, setRoleFormError] = useState<string | null>(null)
 
@@ -100,7 +73,7 @@ export const AdminDashboard: React.FC = () => {
   const [secondaryCategoryIds, setSecondaryCategoryIds] = useState<string[]>([])
   const [isAddingNewCategory, setIsAddingNewCategory] = useState(false)
   const [newCategoryName, setNewCategoryName] = useState('')
-  const [moqInput, setMoqInput] = useState<number | ''>(20)
+  const [moqInput, setMoqInput] = useState<number | ''>(1)
   const [newProdCategory, setNewProdCategory] = useState<'Bio-Fertilizer' | 'Biopesticide' | 'Growth Promoter'>('Bio-Fertilizer')
   const [newProdPrice, setNewProdPrice] = useState<number>(500)
   const [newProdPackSize, setNewProdPackSize] = useState('1 Litre Bottle')
@@ -671,7 +644,7 @@ export const AdminDashboard: React.FC = () => {
                 <span className="font-bold">Price Display Preview: </span>
                 {mainCategory === 'bulk' ? (
                   <span className="font-semibold text-emerald-800">
-                    ₹{newProdPrice}/unit — ₹{newProdPrice * (Number(moqInput) || 20)} for MOQ of {Number(moqInput) || 20} units
+                    ₹{newProdPrice}/unit
                   </span>
                 ) : (
                   <span className="font-semibold text-emerald-800">₹{newProdPrice}</span>

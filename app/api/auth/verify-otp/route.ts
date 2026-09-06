@@ -15,7 +15,7 @@ const PREPROVISIONED_ACCOUNTS: Record<
   { name: string; role: 'super_admin' | 'warehouse'; assignedWarehouseId?: string }
 > = {
   '8050946969': { name: 'Super Admin', role: 'super_admin' },
-  '7975158924': { name: 'Warehouse Manager', role: 'warehouse', assignedWarehouseId: 'wh-central' }
+  '7975158924': { name: 'Warehouse Manager', role: 'warehouse', assignedWarehouseId: 'wh-taloja' }
 }
 
 export async function POST(request: Request) {

@@ -240,7 +240,7 @@ export async function POST(request: Request) {
       city,
       state: cleanText(body?.state, 40) || 'AP',
       pincode,
-      warehouse_id: cleanText(body?.warehouseId, 60) || 'wh-central',
+      warehouse_id: cleanText(body?.warehouseId, 60) || 'wh-taloja',
       items: resolvedItems,
       subtotal: total,
       total,

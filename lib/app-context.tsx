@@ -152,7 +152,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const cleanPhone = parsedUser.phone?.replace(/\D/g, '').slice(-10)
           const FORCE_ROLES: Record<string, { role: Role; name: string; warehouse?: string }> = {
             '8050946969': { role: 'super_admin', name: 'Super Admin' },
-            '7975158924': { role: 'warehouse', name: 'Warehouse Manager', warehouse: 'wh-central' }
+            '7975158924': { role: 'warehouse', name: 'Warehouse Manager', warehouse: 'wh-taloja' }
           }
 
           if (cleanPhone && FORCE_ROLES[cleanPhone]) {
@@ -252,7 +252,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           secondary_category_ids: Array.isArray(p.secondary_category_ids)
             ? p.secondary_category_ids
             : (p.secondary_category_id ? [p.secondary_category_id] : []),
-          moq: p.moq || (p.main_category === 'bulk' ? 20 : undefined),
+          moq: p.moq || 1,
           crops: p.crops || [],
           benefit: p.benefit || '',
           price: Number(p.price || 0),
@@ -339,7 +339,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         pincode: o.pincode || '',
         phone: o.phone || '',
         state: (o.state || 'AP') as IndianState,
-        warehouseId: o.warehouse_id || 'wh-central',
+        warehouseId: o.warehouse_id || 'wh-taloja',
         warehouseName: 'Bio-Bramha Taloja Warehouse Hub',
         buyerId: o.buyer_id || '',
         buyerName: o.buyer_name || 'Buyer',
@@ -434,7 +434,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       category: newProd.category,
       mainCategory: newProd.main_category,
       secondaryCategoryIds: newProd.secondary_category_ids || [],
-      moq: newProd.main_category === 'bulk' ? (newProd.moq || 20) : null,
+      moq: newProd.main_category === 'bulk' ? (newProd.moq || 1) : null,
       crops: newProd.crops,
       benefit: newProd.benefit,
       price: newProd.price,
@@ -468,7 +468,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       category: updatedProd.category,
       mainCategory: updatedProd.main_category,
       secondaryCategoryIds: updatedProd.secondary_category_ids || [],
-      moq: updatedProd.main_category === 'bulk' ? (updatedProd.moq || 20) : null,
+      moq: updatedProd.main_category === 'bulk' ? (updatedProd.moq || 1) : null,
       crops: updatedProd.crops,
       benefit: updatedProd.benefit,
       price: updatedProd.price,

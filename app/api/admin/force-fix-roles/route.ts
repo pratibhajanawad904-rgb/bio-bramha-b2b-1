@@ -25,7 +25,7 @@ export async function POST() {
           phone: '7975158924',
           name: 'Warehouse Manager',
           role: 'warehouse',
-          assigned_warehouse_id: 'wh-central'
+          assigned_warehouse_id: 'wh-taloja'
         }
       ])
       .select()

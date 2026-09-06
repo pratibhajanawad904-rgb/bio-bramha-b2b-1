@@ -57,7 +57,7 @@ export async function POST(request: Request) {
           phone: cleanedTargetPhone,
           name: targetName || serverResult.name || `User ${cleanedTargetPhone}`,
           role: newRole,
-          assigned_warehouse_id: newRole === 'warehouse' ? targetWarehouseId || 'wh-central' : null,
+          assigned_warehouse_id: newRole === 'warehouse' ? targetWarehouseId || 'wh-taloja' : null,
           updated_at: new Date().toISOString()
         },
         { onConflict: 'phone' }

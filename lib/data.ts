@@ -153,7 +153,7 @@ export const DEFAULT_WAREHOUSE_LOCATION = 'Taloja, Mumbai, Maharashtra'
 
 export const WAREHOUSES: Warehouse[] = [
   {
-    id: 'wh-central',
+    id: 'wh-taloja',
     name: DEFAULT_WAREHOUSE_NAME,
     code: 'WH-BB-TALOJA',
     state: 'MH',
@@ -179,7 +179,7 @@ export const USERS: UserAccount[] = [
     name: 'Warehouse Manager',
     phone: '7975158924',
     role: 'warehouse',
-    assignedWarehouseId: 'wh-central',
+    assignedWarehouseId: 'wh-taloja',
     joinedDate: 'Aug 2026',
     state: 'AP'
   }
@@ -197,7 +197,7 @@ export const PRODUCTS: Product[] = [
     category: 'Bio-Fertilizer',
     main_category: 'bulk',
     secondary_category_ids: [],
-    moq: 20,
+    moq: 1,
     crops: ['Paddy', 'Sugarcane', 'Cotton', 'Maize', 'Millets'],
     benefit: 'Fixes atmospheric nitrogen up to 25-30 kg/ha and enhances root development.',
     price: 450,
@@ -261,7 +261,7 @@ export const PRODUCTS: Product[] = [
     category: 'Bio-Fertilizer',
     main_category: 'bulk',
     secondary_category_ids: [],
-    moq: 20,
+    moq: 1,
     crops: ['All Crops', 'Pulses', 'Groundnut', 'Soybean', 'Vegetables'],
     benefit: 'Solubilizes fixed soil phosphorus (up to 40 kg P2O5/ha) making it plant-absorbable.',
     price: 420,
@@ -324,7 +324,7 @@ export const PRODUCTS: Product[] = [
     category: 'Biopesticide',
     main_category: 'bulk',
     secondary_category_ids: [],
-    moq: 20,
+    moq: 1,
     crops: ['Chilli', 'Cotton', 'Ginger', 'Turmeric', 'Banana'],
     benefit: 'Prevents soil-borne fungal wilt, root rot, damping-off & collar rot.',
     price: 390,
@@ -356,7 +356,7 @@ export const PRODUCTS: Product[] = [
     category: 'Bio-Fertilizer',
     main_category: 'bulk',
     secondary_category_ids: [],
-    moq: 20,
+    moq: 1,
     crops: ['Soybean', 'Groundnut', 'Bengal Gram', 'Red Gram', 'Black Gram'],
     benefit: 'Fixes atmospheric nitrogen 50-100 kg/ha specifically for leguminous crops via root nodulation.',
     price: 380,
@@ -385,7 +385,7 @@ export const PRODUCTS: Product[] = [
     category: 'Bio-Fertilizer',
     main_category: 'bulk',
     secondary_category_ids: [],
-    moq: 20,
+    moq: 1,
     crops: ['Banana', 'Sugarcane', 'Potato', 'Turmeric', 'All Crops'],
     benefit: 'Mobilizes bound potassium from soil minerals, reducing chemical KCl usage by 25-30%.',
     price: 440,

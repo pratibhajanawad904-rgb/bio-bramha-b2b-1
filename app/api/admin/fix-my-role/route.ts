@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     // Define correct roles
     const CORRECT_ROLES: Record<string, { role: string; name: string; warehouse?: string }> = {
       '8050946969': { role: 'super_admin', name: 'Super Admin' },
-      '7975158924': { role: 'warehouse', name: 'Warehouse Manager', warehouse: 'wh-central' }
+      '7975158924': { role: 'warehouse', name: 'Warehouse Manager', warehouse: 'wh-taloja' }
     }
 
     const correct = CORRECT_ROLES[cleanPhone]
