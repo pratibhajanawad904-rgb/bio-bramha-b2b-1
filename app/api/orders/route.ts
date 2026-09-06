@@ -181,7 +181,7 @@ export async function POST(request: Request) {
 
     if (productError) {
       console.error('[orders] product lookup failed:', productError.message)
-      return serverError('Could not create the order.')
+      return serverError('Server could not reach the product database. Please contact support.')
     }
 
     const { data: activeOffers } = await supabaseAdmin
@@ -255,7 +255,7 @@ export async function POST(request: Request) {
 
     if (insertError) {
       console.error('[orders] insert failed:', insertError.message)
-      return serverError('Could not create the order.')
+      return serverError('Order could not be saved. Please try again or contact support.')
     }
 
     // First order doubles as address capture: save it as the default if the user has

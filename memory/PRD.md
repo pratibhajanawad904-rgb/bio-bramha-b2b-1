@@ -40,6 +40,10 @@ remove "Modes", Capacitor Android safe areas/keyboard, preserve admin + security
 - Orders now sorted newest first (table has no created_at: sort by date, then placed timestamp)
 - Restored truncated product images (azospirillum.png / -field.png were cut at 512KB/1MB in last commit) from initial import
 
+## LIVE ROOT CAUSE (2026-06): Vercel env typo
+- Live site bundle (bio-bramha-b2b-1-git-main-pratibha-projects.vercel.app) contains NEXT_PUBLIC_SUPABASE_URL=https://rmyvftmmcoultlvipmjyw.supabase.co (typo: "tl"); real project is rmyvftmmcoulhvipmjyw. Host does not resolve -> every server DB call fails -> "Could not create the order.", OTP verify says isNewUser for existing users.
+- Fix is in Vercel env vars (correct URL, redeploy). Added /api/health self-check (no secrets) + clearer order error messages.
+
 ## Verification
 - `next build` OK, `tsc --noEmit` 0 errors (excluding reference design-components/)
 - Testing agent iteration_1: 11/12 pass; the 1 crash (order detail without timeline) fixed and re-verified
