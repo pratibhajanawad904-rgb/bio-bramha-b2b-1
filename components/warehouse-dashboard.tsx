@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useApp } from '@/lib/app-context'
+import { getSupportPhone } from '@/lib/data'
 import {
   Warehouse,
   CheckCircle2,
@@ -412,7 +413,7 @@ export const WarehouseDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-slate-900 text-white p-6 rounded-2xl space-y-3 border border-slate-800 shadow-sm relative overflow-hidden">
               <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Official Helpline Phone Number</span>
-              <h4 className="text-xl font-bold text-amber-400 font-mono">{helplineNumber}</h4>
+              <h4 className="text-xl font-bold text-amber-400 font-mono">{getSupportPhone(helplineNumber) || <span className="text-sm text-slate-400 font-sans">Not configured — set it from Admin › Support Contact Settings</span>}</h4>
               <p className="text-xs text-slate-300">Displayed on buyer orders for one-touch direct phone calling.</p>
             </div>
 
@@ -577,7 +578,7 @@ export const WarehouseDashboard: React.FC = () => {
                     required
                     value={editingPhone}
                     onChange={(e) => setEditingPhone(e.target.value)}
-                    placeholder="e.g. 1800-425-9999 / +91 94400 12345"
+                    placeholder="Support phone number"
                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm font-mono font-bold text-slate-900 focus:ring-2 focus:ring-amber-500 bg-slate-50"
                   />
                 </div>

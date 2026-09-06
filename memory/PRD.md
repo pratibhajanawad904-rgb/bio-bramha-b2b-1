@@ -1,79 +1,41 @@
-# Dealer Mitra — BioBrahma B2B Fertilizer Distribution (MVP V1)
+# Dealer Mitra — BioBrahma B2B Fertilizer Distribution (MVP Final Check)
 
 ## Problem Statement
-Upgrade the EXISTING Next.js + Supabase + Capacitor B2B fertilizer app to a production-ready,
-mobile-first MVP for Google Play. Preserve all working auth/data/logic; merge design-components
-improvements; apply specific business/UI corrections.
+Existing Next.js 16 + Supabase + Capacitor Android B2B app. Final production check: dealer ID linkage & data isolation,
+merge design-components/ into components/, perfect mobile login layout, MOQ=1 + unit pricing, cart/checkout,
+saved/default addresses, Reorder, post-order navigation, warehouse locked to Taloja, clean payment/support messaging,
+remove "Modes", Capacitor Android safe areas/keyboard, preserve admin + security.
 
 ## Architecture (unchanged)
-- Next.js 16 (App Router) + React 19 + TS + Tailwind v4
-- Supabase (Postgres) via server-side `/api` routes (service_role); RLS-locked
-- MSG91 phone OTP (server-backed; secrets server-only in lib/env.ts)
-- Capacitor 8 Android; web build vs `output:'export'` native build (lib/platform.ts)
-- Entry: app/page.tsx -> AppProvider -> LoginGate -> AppShell
+- Next.js 16 App Router, React 19, Tailwind v4; server /api routes use Supabase service_role (lib/supabase-admin.ts)
+- Session: signed JWT from /api/auth/verify-otp; identity = normalized 10-digit phone; dealer id = `user-<phone>`
+- Tables: products, offers, orders(buyer_id, phone), user_accounts, user_addresses(phone, is_default), app_settings
+- RLS: anon has no access to orders/user_accounts/user_addresses; all dealer data goes through session-scoped /api routes
+- Capacitor: web build = server (Vercel), APK = static export talking to NEXT_PUBLIC_API_BASE_URL
+- No Google OAuth exists in codebase (google-auth-button.tsx is a legacy-named, unused phone-OTP modal)
 
-## Implemented (2026-06)
-- MOQ = 1 for ALL products: lib/app-context (addToCart/updateCartItemQuantity),
-  api/orders/route.ts (removed bulk MOQ enforcement), catalog/cart steppers step by 1.
-- Clear unit pricing "₹X / unit" on cards; cart shows unit × qty = line total; checkout shows
-  per-line "price × qty = total".
-- Prominent "Add to Cart" (full-width, min-h ~46px touch target); qty stepper 44px targets.
-- Post-order navigation: checkout shows a success confirmation panel (order id + total) then
-  "View My Orders" routes to my-orders (no home redirect; no duplicate orders).
-- Saved-address flow in checkout: loads addresses (GET /api/account/address), radio-select,
-  "Add New Address", "Save this address for future orders" (POST). No schema change.
-- Payment section cleaned (removed harsh debug-red instruction box; production wording).
-  Removed "Supabase Cloud Live" header badge and "MSG91 Gateway" OTP footer.
-- Default warehouse repointed to Taloja, Mumbai, Maharashtra (lib/data.ts); warehouse SELECTOR
-  removed from checkout — dealer sees static "Taloja, Mumbai, Maharashtra". Guntur removed.
-- Support: tel: link kept & works; number stays configurable via Admin dashboard (NOT fabricated).
-- Loading states: Place Order disables + spinner (prevents duplicate submit).
-- Mobile/Capacitor: safe-area padding on checkout/OTP modals, inputMode=numeric, no horizontal
-  scroll, responsive spacing merged from design-components.
-- data-testid added across catalog, cart, checkout, login for QA.
+## Implemented this session (2026-06)
+- Data isolation: removed demo "ramesh" order filter (header + orders view); orders filtered strictly by buyerId
+- Reorder: stock/availability check, uses CURRENT catalog price, caps qty to stock, reports unavailable items, opens cart, never auto-places
+- Checkout: delete saved address, "Delivering here"/Default badges, state selector (MH default), unit price · qty lines, "Place Order" button
+- Support: removed fabricated helpline default ('1800-425-9999 / +91 94400 12345' treated as NOT configured); tel: link only when admin configured a number
+- "Modes" removed: header role pill + "Role: X mode" text, "Admin/Warehouse Mode", "Catalogue Preview Mode"
+- Design merge: header dropdown (design version), app-shell nav history + Android hardware back button (@capacitor/app), Profile in bottom nav, cart drawer safe-area footer
+- Login: min-w-0/shrink-0 fixes, inputMode numeric, autocomplete one-time-code, 48px buttons, verified 320/360/390 no overflow
+- Mobile: globals.css overflow-x hidden + 16px inputs, AndroidManifest windowSoftInputMode=adjustResize
+- Security: removed hard-coded MSG91 auth key/template from client bundle; native OTP send/verify now go through server /api/auth routes; DEPLOYMENT.md scrubbed. ACTION: rotate MSG91 key (was in git history)
+- Order detail modal null-guards timeline/items
 
 ## Verification
-- `next build` (production) SUCCEEDS.
-- `tsc --noEmit`: 0 errors in app code (only pre-existing errors inside reference folder
-  design-components/, which is not imported and build ignores TS errors).
-- Login screen renders at 390px mobile viewport.
+- `next build` OK, `tsc --noEmit` 0 errors (excluding reference design-components/)
+- Testing agent iteration_1: 11/12 pass; the 1 crash (order detail without timeline) fixed and re-verified
+- NOT verifiable here: real OTP login, Supabase-backed order/address persistence (no secrets in this env)
 
-## NOT verifiable in this preview env
-- Authenticated E2E (OTP verify, catalog load, order creation, saved addresses) needs the
-  user's Supabase + MSG91 secrets (server-only, not in repo) and same-origin /api routing.
-  These run on the user's Vercel/native deployment, not this Emergent preview.
+## Schema
+- No migration needed: user_addresses already exists (0002). Optional cleanup SQL:
+  update public.app_settings set helpline_number = null where helpline_number = '1800-425-9999 / +91 94400 12345';
 
-## Seed accounts (unchanged): super_admin 8050946969, warehouse 7975158924
-
-## Backlog / Next
-- Admin: set real support phone/UPI/QR from Admin dashboard (already supported).
-- Optional: address edit-in-checkout, delivery-state selector.
-
-## Iteration 2 (2026-06)
-- Address Editing in checkout: each saved address has an Edit (pencil) action; opens the form
-  pre-filled with Update/Cancel; persists via PATCH /api/account/address and reloads.
-  Place Order is disabled while an address edit is unsaved.
-- Reorder: each past order in My Orders has a "Reorder" button — clears the cart, re-adds the
-  order's still-available items, shows a toast, and opens the cart drawer (app-shell passes
-  onOpenCart). Unavailable products are skipped with a message.
-- Verified: `next build` succeeds; tsc clean for all app code.
-
-## Iteration 3 (2026-06) — Mobile layout polish
-- Login gate (login-gate.tsx): replaced plain bg-slate-900 with emerald→slate gradient,
-  min-h-[100dvh], safe-area top/bottom padding, responsive card padding. Fixes "floating card
-  in black box" look on real phones.
-- AppShell root switched to min-h-[100dvh] so content respects Android bars.
-- Verified: next build succeeds; login renders correctly at 360px.
-- NOTE: "Could not send OTP" in the preview browser is expected — /api/auth/send-otp needs
-  MSG91+Supabase env keys and same-origin routing, available on Vercel/native, not preview.
-
-## Iteration 4 (2026-06) — Env / OTP resolution
-- Root cause of "Could not send OTP": no .env.local existed; server route threw on missing
-  MSG91_AUTH_KEY. Created /app/.env.local with existing MSG91 creds (from .env.example) +
-  generated SESSION_SECRET.
-- User supplied real Supabase creds; added to /app/.env.local (URL/anon publishable/service-role).
-- Verified locally: /api/settings returns live DB data (Supabase OK); /api/auth/send-otp -> success
-  (MSG91 OK); /api/auth/verify-otp reaches account lookup, returns clean 400 on bad code.
-- NOTE: Emergent preview URL routes /api to a separate port and does not serve this Next app's
-  API routes -> OTP only testable on Vercel / Capacitor. User must also add the 7 env vars in
-  Vercel project settings (.env.local is not deployed).
+## Backlog
+- P1: Admin sets real support phone via Admin › Support Contact Settings
+- P2: Stock check server-side in /api/orders POST; stock decrement on order
+- P2: Update supabase/seed.sql to drop placeholder helpline for fresh installs

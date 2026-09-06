@@ -144,8 +144,25 @@ export type Offer = {
   productIds: string[]
 }
 
-export const DEFAULT_HELPLINE_NUMBER = '1800-425-9999 / +91 94400 12345'
+// No fabricated support number: the helpline is configured by an admin (app_settings).
+// The legacy seed placeholder is treated as "not configured".
+export const DEFAULT_HELPLINE_NUMBER = ''
 export const DEFAULT_HELPLINE_EMAIL = 'support@biobramha.com'
+const PLACEHOLDER_HELPLINES = ['1800-425-9999 / +91 94400 12345', '1800-425-9999', '+91 94400 12345']
+
+/** Returns a configured, non-placeholder support number or null. */
+export function getSupportPhone(helplineNumber: string | undefined | null): string | null {
+  const raw = String(helplineNumber || '').trim()
+  if (!raw || PLACEHOLDER_HELPLINES.includes(raw)) return null
+  const first = raw.split('/')[0].trim()
+  return first.replace(/\D/g, '').length >= 6 ? first : null
+}
+
+/** tel: href for a display number (digits and leading + only). */
+export function telHref(displayNumber: string): string {
+  const cleaned = displayNumber.trim().replace(/[^\d+]/g, '')
+  return `tel:${cleaned.startsWith('+') ? '+' + cleaned.slice(1).replace(/\+/g, '') : cleaned}`
+}
 
 // MVP V1: single default warehouse — Taloja, Mumbai, Maharashtra.
 export const DEFAULT_WAREHOUSE_NAME = 'Bio-Bramha Taloja Warehouse Hub'

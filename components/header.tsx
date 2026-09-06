@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, setIsCa
   const activeOffersCount = offers.filter((o) => o.active).length
   const activeBuyerOrdersCount = orders.filter(
     (o) =>
-      (o.buyerId === currentUser.id || (o.buyerName && o.buyerName.toLowerCase().includes('ramesh')) || o.buyerEmail === currentUser.email) &&
+      o.buyerId === currentUser.id &&
       o.status !== 'delivered' &&
       o.status !== 'cancelled'
   ).length
@@ -129,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, setIsCa
 
         {/* Action Controls: Cart & Unified Account Menu */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Cart Icon (Buyer Mode) */}
+          {/* Cart (buyers only) */}
           {currentUser.role === 'buyer' && (
             <button
               onClick={() => setIsCartOpen(true)}
@@ -146,7 +146,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, setIsCa
             </button>
           )}
 
-          {/* Unified Account Profile & Role Switcher Dropdown */}
+          {/* Account menu */}
           <div className="relative shrink-0">
             <button
               onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
@@ -155,18 +155,8 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, setIsCa
               <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-600 text-white font-black text-[10px] sm:text-xs flex items-center justify-center shrink-0">
                 {currentUser.name.charAt(0)}
               </div>
-              <span className="truncate max-w-[65px] xs:max-w-[90px] sm:max-w-[130px] font-bold text-slate-900">
-
+              <span className="truncate max-w-[80px] sm:max-w-[130px] font-bold text-slate-900 text-xs sm:text-sm" data-testid="account-menu-name">
                 {currentUser.name.split(' ')[0]}
-              </span>
-              <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md ${
-                currentUser.role === 'buyer'
-                  ? 'bg-emerald-100 text-emerald-800'
-                  : currentUser.role === 'warehouse'
-                  ? 'bg-amber-100 text-amber-900'
-                  : 'bg-indigo-100 text-indigo-800'
-              }`}>
-                {currentUser.role}
               </span>
               <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform ${isAccountMenuOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -187,33 +177,25 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, setIsCa
                     </div>
                     <div className="min-w-0 flex-1">
                       <h4 className="font-bold text-slate-900 text-sm truncate">{currentUser.name}</h4>
-                      <p className="text-xs text-slate-500 truncate">{currentUser.email}</p>
-                      <span className="text-[10px] font-bold uppercase text-emerald-700 mt-0.5 block">
-                        Role: {currentUser.role} mode
-                      </span>
+                      <p className="text-xs text-slate-500 truncate font-mono">{currentUser.phone || currentUser.email}</p>
                     </div>
                   </div>
 
-                  {/* Account Info Notice */}
-                  <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-medium">
-                    {currentUser.role === 'admin' ? (
-                      <span className="text-indigo-700 font-bold">Authorized System Administrator</span>
-                    ) : currentUser.role === 'warehouse' ? (
-                      <span className="text-amber-800 font-bold">Authorized Central Warehouse Manager</span>
-                    ) : (
-                      <span className="text-emerald-700 font-bold">Authorized B2B Dealer / Buyer</span>
-                    )}
-                  </div>
-                  {/* Account info - no switching without proper logout */}
-                  <div className="pt-2 border-t border-slate-100">
-                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 text-xs text-blue-900 leading-relaxed font-medium">
-                      <strong className="block mb-1">🔒 Secure Account Session</strong>
-                      <p className="text-[11px]">
-                        Logged in as <span className="font-bold">{currentUser.phone}</span>. 
-                        To switch accounts, please logout and sign in with a different phone number.
-                      </p>
+                  {currentUser.role !== 'buyer' && (
+                    <div className="text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-medium">
+                      {currentUser.role === 'admin' || currentUser.role === 'super_admin' ? (
+                        <span className="text-indigo-700 font-bold flex items-center gap-1.5">
+                          <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                          <span>System Administrator</span>
+                        </span>
+                      ) : (
+                        <span className="text-amber-800 font-bold flex items-center gap-1.5">
+                          <Warehouse className="w-3.5 h-3.5 shrink-0" />
+                          <span>Central Warehouse Manager</span>
+                        </span>
+                      )}
                     </div>
-                  </div>
+                  )}
 
                   {/* Profile Button */}
                   <div className="pt-2">
@@ -222,6 +204,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, setIsCa
                         setIsAccountMenuOpen(false)
                         setActiveTab('profile')
                       }}
+                      data-testid="account-menu-profile-btn"
                       className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <User className="w-4 h-4" />

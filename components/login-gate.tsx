@@ -160,8 +160,8 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-emerald-900 via-slate-900 to-slate-950 flex items-center justify-center px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-center space-y-5 my-auto">
+    <div className="min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden overflow-y-auto bg-gradient-to-b from-emerald-900 via-slate-900 to-slate-950 flex items-center justify-center px-3 sm:px-4 pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1rem))]" data-testid="login-page">
+      <div className="bg-white rounded-3xl max-w-md w-full min-w-0 p-5 sm:p-8 shadow-2xl border border-slate-200 text-center space-y-5 my-auto" data-testid="login-card">
         
         <div className="flex justify-center">
           <div className="w-16 h-16 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30">
@@ -170,7 +170,7 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
 
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Bio-Bramha Dealer Mitra</h1>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight break-words">Bio-Bramha Dealer Mitra</h1>
           <p className="text-xs text-slate-500 font-semibold mt-1">B2B Agri Dealer & Distribution Portal</p>
         </div>
 
@@ -186,16 +186,16 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
 
         {errorMsg && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-2xl text-xs font-semibold flex items-center gap-2 text-left animate-shake">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-            <span>{errorMsg}</span>
+          <div className="bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-2xl text-xs font-semibold flex items-start gap-2 text-left animate-shake min-w-0" data-testid="login-error">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <span className="break-words min-w-0">{errorMsg}</span>
           </div>
         )}
 
         {successMsg && (
           <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-2xl text-xs font-semibold flex items-center gap-2 text-left">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{successMsg}</span>
+            <span className="break-words min-w-0">{successMsg}</span>
           </div>
         )}
 
@@ -204,11 +204,11 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
           <form onSubmit={handleSendOTP} className="space-y-4 text-left">
             <div>
               <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
-                <Phone className="w-4 h-4 text-emerald-600" />
-                Mobile Phone Number
+                <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Mobile Phone Number</span>
               </label>
-              <div className="flex items-center gap-2">
-                <span className="px-3.5 py-3 rounded-xl border border-slate-200 text-sm font-bold bg-slate-100 text-slate-700">
+              <div className="flex items-center gap-2 w-full min-w-0">
+                <span className="shrink-0 px-3 py-3 rounded-xl border border-slate-200 text-sm font-bold bg-slate-100 text-slate-700 font-mono">
                   +91
                 </span>
                 <input
@@ -219,8 +219,10 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
                   required
                   maxLength={10}
                   inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="tel-national"
                   data-testid="login-phone-input"
-                  className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-base font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 text-slate-900 tracking-wider"
+                  className="flex-1 min-w-0 w-full px-3.5 py-3 rounded-xl border border-slate-200 text-base font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 text-slate-900 font-mono tracking-wider"
                 />
               </div>
             </div>
@@ -228,7 +230,8 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
             <button
               type="submit"
               disabled={isLoading || phoneInput.length < 10}
-              className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
+              data-testid="login-send-otp-btn"
+              className="w-full min-h-[48px] py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <RefreshCw className="w-5 h-5 animate-spin" />
@@ -247,8 +250,8 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
           <form onSubmit={handleVerifyOTP} className="space-y-4 text-left">
             <div>
               <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
-                <Lock className="w-4 h-4 text-emerald-600" />
-                Enter 6-Digit OTP
+                <Lock className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Enter 6-Digit OTP</span>
               </label>
               <input
                 type="text"
@@ -258,15 +261,19 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
                 required
                 maxLength={6}
                 inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="one-time-code"
+                autoFocus
                 data-testid="login-otp-input"
-                className="w-full text-center px-4 py-3.5 rounded-xl border border-slate-300 text-xl font-mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50"
+                className="w-full min-w-0 text-center px-4 py-3.5 rounded-xl border border-slate-300 text-xl font-mono font-bold tracking-[0.35em] focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 text-slate-900"
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading || otpInput.length < 4}
-              className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
+              data-testid="login-verify-otp-btn"
+              className="w-full min-h-[48px] py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <RefreshCw className="w-5 h-5 animate-spin" />
@@ -278,7 +285,7 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
               )}
             </button>
 
-            <div className="flex items-center justify-between text-xs pt-1">
+            <div className="flex items-center justify-between gap-2 text-xs pt-1">
               <button
                 type="button"
                 onClick={() => {
@@ -286,7 +293,8 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
                   setErrorMsg(null)
                   setSuccessMsg(null)
                 }}
-                className="text-slate-500 hover:text-slate-800 font-semibold cursor-pointer"
+                data-testid="login-change-number-btn"
+                className="min-h-[40px] px-2 text-slate-500 hover:text-slate-800 font-semibold cursor-pointer"
               >
                 ← Change Number
               </button>
@@ -295,7 +303,8 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
                 type="button"
                 disabled={resendTimer > 0 || isLoading}
                 onClick={handleSendOTP}
-                className="text-emerald-700 hover:underline font-bold disabled:text-slate-400 cursor-pointer"
+                data-testid="login-resend-otp-btn"
+                className="min-h-[40px] px-2 text-emerald-700 hover:underline font-bold disabled:text-slate-400 cursor-pointer"
               >
                 {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
               </button>
@@ -319,7 +328,9 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
                 value={fullNameInput}
                 onChange={(e) => setFullNameInput(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 text-slate-900"
+                autoComplete="name"
+                data-testid="login-name-input"
+                className="w-full min-w-0 px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 text-slate-900"
               />
             </div>
 
@@ -330,7 +341,10 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
                 placeholder=""
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 text-slate-900"
+                autoComplete="email"
+                inputMode="email"
+                data-testid="login-email-input"
+                className="w-full min-w-0 px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 text-slate-900"
               />
             </div>
 
@@ -344,7 +358,8 @@ export const LoginGate: React.FC<{ children: React.ReactNode }> = ({ children })
             <button
               type="submit"
               disabled={isLoading || (policyVersion !== null && !consented)}
-              className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
+              data-testid="login-create-account-btn"
+              className="w-full min-h-[48px] py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <RefreshCw className="w-5 h-5 animate-spin" />

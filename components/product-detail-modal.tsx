@@ -230,7 +230,7 @@ export const ProductDetailModal: React.FC = () => {
             ) : (
               <div className="pt-4 border-t border-slate-100">
                 <div className="bg-slate-100 text-slate-700 p-3.5 rounded-xl text-xs font-semibold text-center border border-slate-200">
-                  Catalogue Preview Mode — Purchasing is reserved for Buyer Accounts. Logged in as <span className="uppercase font-bold text-slate-900">{currentUser.role}</span>.
+                  Catalogue Preview — Purchasing is reserved for Buyer Accounts.
                 </div>
               </div>
             )}

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useApp } from '@/lib/app-context'
-import { X, Truck, CheckCircle2, ShieldCheck, MapPin, Phone, Building, AlertCircle, Plus, Star, Loader2, Package, Edit3, Check } from 'lucide-react'
+import { X, Truck, CheckCircle2, ShieldCheck, MapPin, Phone, Building, AlertCircle, Plus, Star, Loader2, Package, Edit3, Check, Trash2 } from 'lucide-react'
 import { isValidPhoneNumber, isValidPincode } from '@/lib/security'
 import { fetchAppSettings } from '@/lib/settings-client'
 import { api } from '@/lib/api-client'
@@ -29,6 +29,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
   const [address, setAddress] = useState('')
   const [city, setCity] = useState('')
   const [pincode, setPincode] = useState('')
+  const [addrState, setAddrState] = useState('MH')
   const [phone, setPhone] = useState(currentUser.phone || '')
   const [validationError, setValidationError] = useState<string | null>(null)
   const [paymentSettings, setPaymentSettings] = useState<{ qrCodeImage: string | null; upiId: string; accountDetails: string } | null>(null)
@@ -90,6 +91,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
     setAddress(a.line1)
     setCity(a.city)
     setPincode(a.pincode)
+    setAddrState(a.state || 'MH')
   }
 
   function chooseNewAddress() {
@@ -105,6 +107,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
     setAddress(a.line1)
     setCity(a.city)
     setPincode(a.pincode)
+    setAddrState(a.state || 'MH')
     setValidationError(null)
   }
 
@@ -129,7 +132,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
     }
     setSavingAddr(true)
     try {
-      const res = await api.updateAddress(id, { line1: address, city, pincode, state: 'MH' })
+      const res = await api.updateAddress(id, { line1: address, city, pincode, state: addrState })
       if (!res.success) {
         setValidationError(res.error || 'Could not update the address.')
         return
@@ -168,14 +171,29 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
 
   const orderTotal = orderLineItems.reduce((sum, line) => sum + line.price * line.qty, 0)
 
-  const getButtonText = () => {
-    switch (paymentTerms) {
-      case 'Advance UPI/QR':
-        return 'Confirm Order & Pay via UPI/QR'
-      case 'NEFT/RTGS Bank Transfer':
-        return 'Confirm Order & Pay via Bank Transfer'
-      default:
-        return 'Confirm Order'
+  const getButtonText = () => 'Place Order'
+
+  async function handleDeleteAddress(a: SavedAddress) {
+    if (!confirm('Remove this saved address?')) return
+    setSavingAddr(true)
+    try {
+      const res = await api.deleteAddress(a.id)
+      if (!res.success) {
+        setValidationError(res.error || 'Could not remove the address.')
+        return
+      }
+      const r = await api.getAddresses()
+      const list = r.success && Array.isArray(r.addresses) ? (r.addresses as SavedAddress[]) : []
+      setSavedAddresses(list)
+      if (selectedAddressId === a.id) {
+        const def = list.find((x) => x.isDefault) || list[0]
+        if (def) applyAddress(def)
+        else chooseNewAddress()
+      }
+    } catch {
+      setValidationError('Could not remove the address. Please try again.')
+    } finally {
+      setSavingAddr(false)
     }
   }
 
@@ -208,7 +226,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
       // Persist a freshly-typed address so it can be reused on future orders.
       if (selectedAddressId === 'new' && saveForFuture) {
         try {
-          await api.addAddress({ line1: address, city, pincode, state: 'MH' })
+          await api.addAddress({ line1: address, city, pincode, state: addrState })
         } catch {
           // Non-fatal: continue with the order even if saving the address fails.
         }
@@ -219,7 +237,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
         city,
         pincode,
         phone,
-        state: 'MH',
+        state: addrState,
         warehouseId,
         paymentMethod: paymentTerms,
         buyerName: currentUser.name || 'Buyer',
@@ -320,11 +338,12 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
               </h4>
               <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 overflow-hidden">
                 {orderLineItems.map((line) => (
-                  <div key={line.productId} className="flex items-center justify-between gap-3 p-3 text-xs sm:text-sm">
-                    <span className="font-semibold text-slate-800 truncate">{line.name}</span>
-                    <span className="text-slate-500 whitespace-nowrap shrink-0">
-                      ₹{line.price} × {line.qty} = <span className="font-bold text-slate-900">₹{(line.price * line.qty).toLocaleString('en-IN')}</span>
-                    </span>
+                  <div key={line.productId} className="flex items-center justify-between gap-3 p-3 text-xs sm:text-sm" data-testid={`checkout-line-${line.productId}`}>
+                    <div className="min-w-0">
+                      <span className="font-semibold text-slate-800 block truncate">{line.name}</span>
+                      <span className="text-[11px] text-slate-500">₹{line.price} / unit · Qty {line.qty}</span>
+                    </div>
+                    <span className="font-bold text-slate-900 whitespace-nowrap shrink-0">₹{(line.price * line.qty).toLocaleString('en-IN')}</span>
                   </div>
                 ))}
               </div>
@@ -361,13 +380,20 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                             className="accent-emerald-600 w-4 h-4 mt-0.5 shrink-0"
                           />
                           <div className="text-xs text-slate-700 min-w-0">
-                            <p className="font-semibold text-slate-900 truncate">{a.line1}</p>
-                            <p>{a.city} - {a.pincode}</p>
-                            {a.isDefault && (
-                              <span className="inline-flex items-center gap-1 text-emerald-700 font-bold mt-0.5">
-                                <Star className="w-3 h-3" /> Default
-                              </span>
-                            )}
+                            <p className="font-semibold text-slate-900 break-words">{a.line1}</p>
+                            <p>{a.city}, {a.state || 'MH'} - {a.pincode}</p>
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {a.isDefault && (
+                                <span className="inline-flex items-center gap-1 text-emerald-700 font-bold bg-emerald-100 px-1.5 py-0.5 rounded" data-testid={`default-badge-${a.id}`}>
+                                  <Star className="w-3 h-3" /> Default
+                                </span>
+                              )}
+                              {selectedAddressId === a.id && !editingAddressId && (
+                                <span className="inline-flex items-center gap-1 text-white font-bold bg-emerald-600 px-1.5 py-0.5 rounded" data-testid={`selected-badge-${a.id}`}>
+                                  <Check className="w-3 h-3" /> Delivering here
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </label>
                         <div className="flex flex-col gap-1 shrink-0">
@@ -375,7 +401,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                             type="button"
                             onClick={() => startEditAddress(a)}
                             data-testid={`edit-address-${a.id}`}
-                            className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer"
+                            className="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer"
                             aria-label="Edit address"
                             title="Edit address"
                           >
@@ -397,13 +423,24 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                                 }
                               }}
                               data-testid={`set-default-address-${a.id}`}
-                              className="w-9 h-9 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center cursor-pointer"
+                              className="w-10 h-10 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center cursor-pointer"
                               aria-label="Set as default"
                               title="Set as default"
                             >
                               <Star className="w-4 h-4" />
                             </button>
                           )}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteAddress(a)}
+                            disabled={savingAddr}
+                            data-testid={`delete-address-${a.id}`}
+                            className="w-10 h-10 rounded-lg bg-rose-50 hover:bg-rose-100 disabled:opacity-50 text-rose-600 flex items-center justify-center cursor-pointer"
+                            aria-label="Remove address"
+                            title="Remove address"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -455,6 +492,20 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                         data-testid="checkout-city-input"
                         className="w-full min-w-0 px-3.5 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900"
                       />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">State</label>
+                      <select
+                        value={addrState}
+                        onChange={(e) => setAddrState(e.target.value)}
+                        data-testid="checkout-state-select"
+                        className="w-full min-w-0 px-3.5 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900"
+                      >
+                        <option value="MH">Maharashtra</option>
+                        <option value="AP">Andhra Pradesh</option>
+                        <option value="TS">Telangana</option>
+                        <option value="KA">Karnataka</option>
+                      </select>
                     </div>
                     <div>
                       <label className="text-xs font-semibold text-slate-700 block mb-1">Pincode</label>

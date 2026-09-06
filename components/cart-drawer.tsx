@@ -33,10 +33,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onOrder
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex justify-end animate-fade-in pt-[env(safe-area-inset-top,0px)]">
+      <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex justify-end animate-fade-in pt-[env(safe-area-inset-top,0px)]" data-testid="cart-drawer">
         <div className="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between overflow-hidden animate-slide-in-right">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-emerald-700" />
               <h3 className="font-bold text-slate-900 text-base">Your Shopping Cart</h3>
@@ -136,7 +136,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onOrder
 
           {/* Footer & Checkout Trigger */}
           {cart.length > 0 && (
-            <div className="p-6 border-t border-slate-200 bg-white space-y-4">
+            <div className="p-4 sm:p-6 border-t border-slate-200 bg-white space-y-3 sm:space-y-4 pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))]">
               <div className="flex items-center justify-between text-slate-900">
                 <span className="text-sm font-semibold">Subtotal</span>
                 <span className="text-xl font-extrabold text-emerald-700">₹{subtotal.toLocaleString('en-IN')}</span>

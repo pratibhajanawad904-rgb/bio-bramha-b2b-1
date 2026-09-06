@@ -163,11 +163,13 @@ export const MobileOTPModal: React.FC<MobileOTPModalProps> = ({ isOpen, onClose 
                   </div>
                   <input
                     type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     maxLength={10}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                     placeholder="Enter 10 digit number"
-                    className="block w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-slate-900 font-mono font-bold"
+                    className="block w-full min-w-0 pl-12 pr-10 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-slate-900 font-mono font-bold"
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                     <Phone className="h-5 w-5 text-slate-400" />
@@ -224,11 +226,14 @@ export const MobileOTPModal: React.FC<MobileOTPModalProps> = ({ isOpen, onClose 
                 </label>
                 <input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="one-time-code"
                   maxLength={6}
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                   placeholder="• • • • • •"
-                  className="block w-full px-4 py-3 text-center tracking-[1em] text-lg font-bold border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-slate-900 font-mono"
+                  className="block w-full min-w-0 px-4 py-3 text-center tracking-[1em] text-lg font-bold border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-slate-900 font-mono"
                 />
                 
                 {error && (

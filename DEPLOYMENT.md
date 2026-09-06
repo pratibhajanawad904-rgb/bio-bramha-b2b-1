@@ -53,12 +53,9 @@ SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key-here
 # 2. JWT Session Encryption
 SESSION_SECRET=your-64-character-random-hex-string
 
-# 3. MSG91 SMS & OTP Configuration (Pre-configured for Bio-Bramha)
-NEXT_PUBLIC_MSG91_AUTH_KEY=549591AtzGH4cg6a5a01e6P1
-MSG91_AUTH_KEY=549591AtzGH4cg6a5a01e6P1
-NEXT_PUBLIC_MSG91_TEMPLATE_ID=6a59ce32c9fa66b2d5069333
-MSG91_TEMPLATE_ID=6a59ce32c9fa66b2d5069333
-NEXT_PUBLIC_MSG91_SENDER_ID=DMTRA
+# 3. MSG91 SMS & OTP Configuration (server-only; never use NEXT_PUBLIC_ for these)
+MSG91_AUTH_KEY=your-msg91-auth-key
+MSG91_TEMPLATE_ID=your-msg91-otp-template-id
 MSG91_SENDER_ID=DMTRA
 ```
 

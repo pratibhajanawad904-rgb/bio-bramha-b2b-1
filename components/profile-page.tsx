@@ -42,7 +42,7 @@ export const ProfilePage: React.FC = () => {
   const [addrLine, setAddrLine] = useState('')
   const [addrCity, setAddrCity] = useState('')
   const [addrPincode, setAddrPincode] = useState('')
-  const [addrState, setAddrState] = useState('AP')
+  const [addrState, setAddrState] = useState('MH')
   const [addrError, setAddrError] = useState('')
 
   // Delete account
@@ -263,7 +263,8 @@ export const ProfilePage: React.FC = () => {
           </h2>
           <button
             onClick={() => setShowAddAddress(true)}
-            className="text-xs font-bold text-emerald-600 flex items-center gap-1 cursor-pointer hover:text-emerald-700"
+            data-testid="profile-add-address-btn"
+            className="min-h-[36px] px-2 text-xs font-bold text-emerald-600 flex items-center gap-1 cursor-pointer hover:text-emerald-700"
           >
             <Plus className="w-3.5 h-3.5" /> Add
           </button>
@@ -274,32 +275,38 @@ export const ProfilePage: React.FC = () => {
         ) : (
           <div className="space-y-2">
             {addresses.map((addr) => (
-              <div key={addr.id} className="flex items-start justify-between bg-slate-50 rounded-xl p-3 border border-slate-100">
-                <div className="text-xs text-slate-700 space-y-0.5">
-                  <p className="font-medium">{addr.line1}</p>
-                  <p>{addr.city}, {addr.state} - {addr.pincode}</p>
+              <div key={addr.id} data-testid={`profile-address-${addr.id}`} className="flex items-start justify-between gap-2 bg-slate-50 rounded-xl p-3 border border-slate-100">
+                <div className="text-xs text-slate-700 space-y-0.5 min-w-0">
+                  <p className="font-medium text-slate-900 break-words">{addr.line1}</p>
+                  <p className="text-slate-600">
+                    {addr.city}, {addr.state || 'MH'} &bull; <span className="font-bold text-slate-800">PIN: {addr.pincode}</span>
+                  </p>
                   {addr.isDefault && (
                     <span className="inline-flex items-center gap-1 text-emerald-700 font-bold mt-1">
-                      <Star className="w-3 h-3" /> Default
+                      <Star className="w-3 h-3" /> Default Address
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                   {!addr.isDefault && (
                     <button
                       onClick={() => handleSetDefault(addr.id)}
-                      className="text-xs text-slate-500 hover:text-emerald-600 cursor-pointer"
+                      data-testid={`profile-set-default-${addr.id}`}
+                      className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 cursor-pointer"
                       title="Set as default"
+                      aria-label="Set as default"
                     >
-                      <Star className="w-3.5 h-3.5" />
+                      <Star className="w-4 h-4" />
                     </button>
                   )}
                   <button
                     onClick={() => handleDeleteAddress(addr.id)}
-                    className="text-xs text-slate-400 hover:text-red-500 cursor-pointer"
+                    data-testid={`profile-delete-address-${addr.id}`}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-rose-50 cursor-pointer"
                     title="Delete"
+                    aria-label="Delete address"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -309,39 +316,68 @@ export const ProfilePage: React.FC = () => {
 
         {/* Add address form */}
         {showAddAddress && (
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
-            <input
-              type="text"
-              placeholder="House no., street, area"
-              value={addrLine}
-              onChange={(e) => setAddrLine(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-            />
-            <div className="flex gap-2">
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3" data-testid="profile-add-address-form">
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">Street Address</label>
               <input
                 type="text"
-                placeholder="City"
-                value={addrCity}
-                onChange={(e) => setAddrCity(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                placeholder="House no., street, area"
+                value={addrLine}
+                onChange={(e) => setAddrLine(e.target.value)}
+                data-testid="profile-address-line-input"
+                className="w-full min-w-0 px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white text-slate-900"
               />
-              <input
-                type="text"
-                placeholder="Pincode"
-                value={addrPincode}
-                onChange={(e) => setAddrPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                maxLength={6}
-                className="w-28 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">City / Town</label>
+                <input
+                  type="text"
+                  placeholder="City / Town"
+                  value={addrCity}
+                  onChange={(e) => setAddrCity(e.target.value)}
+                  data-testid="profile-address-city-input"
+                  className="w-full min-w-0 px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white text-slate-900"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">State</label>
+                <select
+                  value={addrState}
+                  onChange={(e) => setAddrState(e.target.value)}
+                  data-testid="profile-address-state-select"
+                  className="w-full min-w-0 px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white text-slate-900"
+                >
+                  <option value="MH">Maharashtra</option>
+                  <option value="AP">Andhra Pradesh</option>
+                  <option value="TS">Telangana</option>
+                  <option value="KA">Karnataka</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Pincode (6 digits)</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="6-digit Pincode"
+                  value={addrPincode}
+                  onChange={(e) => setAddrPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  maxLength={6}
+                  data-testid="profile-address-pincode-input"
+                  className="w-full min-w-0 px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white text-slate-900 font-mono"
+                />
+              </div>
             </div>
             {addrError && <p className="text-xs text-red-600 font-semibold">{addrError}</p>}
             <div className="flex gap-2">
               <button
                 onClick={handleAddAddress}
                 disabled={saving}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer"
+                data-testid="profile-save-address-btn"
+                className="min-h-[40px] px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer disabled:opacity-50"
               >
-                Save Address
+                {saving ? 'Saving...' : 'Save Address'}
               </button>
               <button
                 onClick={() => setShowAddAddress(false)}

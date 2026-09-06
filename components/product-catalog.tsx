@@ -109,7 +109,7 @@ export const ProductCatalog: React.FC = () => {
             )}
             <div className="min-w-0">
               <span className="font-bold text-xs sm:text-sm block truncate">
-                {currentUser.role === 'warehouse' ? 'Warehouse Mode' : 'Admin Mode'}: Product Inspection
+                {currentUser.role === 'warehouse' ? 'Warehouse View' : 'Admin View'}: Product Inspection
               </span>
               <span className="text-[11px] sm:text-xs text-slate-400 block truncate">
                 Viewing live catalog prices and active offers.

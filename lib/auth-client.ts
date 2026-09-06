@@ -2,24 +2,15 @@ import { CapacitorHttp } from '@capacitor/core'
 import { isNativeApp } from './platform'
 
 /**
- * OTP send/verify that works in the packaged Android app.
+ * OTP send/verify.
  *
- * The web build is a static export, so /api routes only exist under `next dev`.
- * In the native shell we therefore call MSG91 directly. MSG91 sends no
- * Access-Control-Allow-Origin header, so a browser fetch would be blocked by CORS —
- * we use Capacitor's native HTTP client, which is not subject to CORS.
- *
- * We deliberately do NOT enable the global CapacitorHttp fetch patch, because that
- * would also intercept the Supabase client's requests.
+ * Both web and the packaged Android app go through the server's /api/auth routes
+ * (plain fetch on web, CapacitorHttp on native so CORS does not apply). The MSG91
+ * auth key therefore never ships inside the client bundle or the APK.
  */
-
-const MSG91_AUTH_KEY = process.env.NEXT_PUBLIC_MSG91_AUTH_KEY || '549591AtzGH4cg6a5a01e6P1'
-const MSG91_TEMPLATE_ID = process.env.NEXT_PUBLIC_MSG91_TEMPLATE_ID || '6a59ce32c9fa66b2d5069333'
-const MSG91_SENDER_ID = process.env.NEXT_PUBLIC_MSG91_SENDER_ID || 'DMTRA'
 
 /** The UI prompts for a 6-digit code, so both transports must request exactly that. */
 export const OTP_LENGTH = 6
-const OTP_EXPIRY_MINUTES = 10
 
 export interface OtpResult {
   success: boolean
@@ -155,58 +146,6 @@ export function normalizePhone(raw: string): string | null {
   return /^\d{10}$/.test(d) ? d : null
 }
 
-/** MSG91 generates and stores the OTP itself when we omit one, so we don't hold state. */
-async function sendOtpNative(phone: string): Promise<OtpResult> {
-  const res = await CapacitorHttp.post({
-    url: 'https://control.msg91.com/api/v5/otp',
-    headers: {
-      authkey: MSG91_AUTH_KEY,
-      'Content-Type': 'application/json'
-    },
-    data: {
-      template_id: MSG91_TEMPLATE_ID,
-      mobile: `91${phone}`,
-      sender: MSG91_SENDER_ID,
-      // Pinned explicitly: without this MSG91 falls back to the template's own
-      // length (4), which would not match the 6 digits the UI asks the user for.
-      otp_length: OTP_LENGTH,
-      otp_expiry: OTP_EXPIRY_MINUTES
-    }
-  })
-
-  const body = typeof res.data === 'string' ? safeJson(res.data) : res.data
-
-  if (res.status >= 200 && res.status < 300 && body?.type === 'success') {
-    return { success: true, message: body?.message || `OTP sent to +91 ${phone}` }
-  }
-
-  return {
-    success: false,
-    error: body?.message || `Could not send OTP (status ${res.status}).`
-  }
-}
-
-async function verifyOtpNative(phone: string, otp: string): Promise<OtpResult> {
-  const url = `https://control.msg91.com/api/v5/otp/verify?otp=${encodeURIComponent(
-    otp
-  )}&mobile=${encodeURIComponent(`91${phone}`)}`
-
-  const res = await CapacitorHttp.get({
-    url,
-    headers: { authkey: MSG91_AUTH_KEY }
-  })
-
-  const body = typeof res.data === 'string' ? safeJson(res.data) : res.data
-  const message = String(body?.message || '').toLowerCase()
-
-  const verified =
-    body?.type === 'success' || message.includes('success') || message.includes('already verified')
-
-  if (verified) return { success: true }
-
-  return { success: false, error: body?.message || 'Invalid or expired OTP.' }
-}
-
 function safeJson(text: string): any {
   try {
     return JSON.parse(text)
@@ -215,7 +154,7 @@ function safeJson(text: string): any {
   }
 }
 
-/** Sends an OTP. Uses the dev API route on web, native HTTP in the app. */
+/** Sends an OTP via the server route (web: same origin, native: NEXT_PUBLIC_API_BASE_URL). */
 export async function sendOtp(rawPhone: string): Promise<OtpResult> {
   const phone = normalizePhone(rawPhone)
   if (!phone) {
@@ -223,18 +162,9 @@ export async function sendOtp(rawPhone: string): Promise<OtpResult> {
   }
 
   try {
-    if (isNativeApp()) {
-      return await sendOtpNative(phone)
-    }
-
-    const res = await fetch('/api/auth/send-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone })
-    })
-    const data = await res.json().catch(() => ({}))
-    if (!res.ok || !data.success) {
-      return { success: false, error: data.error || 'Could not send OTP.' }
+    const { ok, data } = await postJson('/api/auth/send-otp', { phone })
+    if (!ok || !data?.success) {
+      return { success: false, error: data?.error || 'Could not send OTP.' }
     }
     return { success: true, message: data.message }
   } catch (e: any) {
@@ -242,7 +172,7 @@ export async function sendOtp(rawPhone: string): Promise<OtpResult> {
   }
 }
 
-/** Verifies an OTP. Uses the dev API route on web, native HTTP in the app. */
+/** Verifies an OTP via the server route (web and native). */
 export async function verifyOtp(rawPhone: string, otp: string): Promise<OtpResult> {
   const phone = normalizePhone(rawPhone)
   const cleanOtp = String(otp || '').trim()
@@ -253,18 +183,9 @@ export async function verifyOtp(rawPhone: string, otp: string): Promise<OtpResul
   }
 
   try {
-    if (isNativeApp()) {
-      return await verifyOtpNative(phone, cleanOtp)
-    }
-
-    const res = await fetch('/api/auth/verify-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, otp: cleanOtp })
-    })
-    const data = await res.json().catch(() => ({}))
-    if (!res.ok || !data.verified) {
-      return { success: false, error: data.error || 'Invalid or expired OTP.' }
+    const { ok, data } = await postJson('/api/auth/verify-otp', { phone, otp: cleanOtp })
+    if (!ok || !data?.verified) {
+      return { success: false, error: data?.error || 'Invalid or expired OTP.' }
     }
     return { success: true }
   } catch (e: any) {

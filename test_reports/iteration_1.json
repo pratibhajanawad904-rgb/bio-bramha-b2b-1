@@ -1,0 +1,35 @@
+{
+  "summary": "Frontend-only MVP verification for Dealer Mithra (Bio-Bramha). Tested login responsiveness, catalog+cart, checkout, orders isolation+reorder, support helpline logic, profile, admin gating, mobile bottom nav, 'Modes' removal, and console error hygiene using localStorage-injected session (no Supabase in env). 11/12 requested features PASSED. 1 critical crash found in order detail modal.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "buyer-orders-view.tsx (order detail modal)",
+        "issue": "Clicking view-order-<id> crashes the app with 'Something went wrong' error boundary. Root cause: line 410 `selectedOrder.timeline.map(...)` — component does not null-guard the optional `timeline` array. When an order is loaded from bb_orders (or from the API without a timeline field) the render throws `TypeError: Cannot read properties of undefined (reading 'map')`. All subsequent tests for order-detail-reorder-btn, order-detail-close and 'Taloja' in detail modal could not be executed because the modal never renders.",
+        "selector": "[data-testid=\"view-order-ORD-1001\"] -> [data-testid=\"order-detail-modal\"]",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix buyer-orders-view.tsx line 410: guard `selectedOrder.timeline?.map(...)` (and provide fallback UI when timeline is absent) so the order detail modal renders for orders that were cached/seeded without a timeline. Also add a similar guard for `selectedOrder.items?.map` at line 428 for defensive rendering.",
+    "Optional: align testid naming — the spec references `nav-catalogue` but the code emits `nav-catalog`. Either update the spec or rename the testid for consistency."
+  ],
+  "critical_code_review_comments": [
+    "Order detail modal renders `selectedOrder.timeline.map` without checking existence — will crash any order missing that field (offline cache, older orders, seed data).",
+    "Error boundary is good UX but hides the underlying stack — consider logging via `componentDidCatch` in dev.",
+    "Checkout error surfacing is clean (`checkout-error` shows 'Invalid server response') — good.",
+    "Reorder flow correctly re-prices at current catalog price (₹450) instead of stored 400 and filters unavailable items with a toast — matches spec."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (not tested per request)", "frontend": "~92% (11/12 spec items pass; 1 critical crash)"},
+  "test_credentials": "No /app/memory/test_credentials.md present. Session simulated via localStorage keys biobramha_session_token / biobramha_logged_user / bb_consent_given as per instructions.",
+  "seed_data_creation": "bb_orders seeded with ORD-1001 (buyer user-9000000001, azo qty2 @400 + discontinued prod-gone @100) and ORD-1002 (other buyer). bb_helpline_num tested with unset, '+91 98765 43210', and legacy '1800-425-9999 / +91 94400 12345'.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All spec items verified end-to-end except order-detail modal which crashes. After fix (add optional-chaining on selectedOrder.timeline in components/buyer-orders-view.tsx around line 410), re-run: seed bb_orders as in this iteration → nav-my-orders → click view-order-ORD-1001 → assert 'Taloja, Mumbai, Maharashtra' in body, [data-testid=order-detail-reorder-btn] & [data-testid=order-detail-close] present. Everything else (login 320/360/390 overflow-free, cart math, checkout modal with Taloja + no Guntur, reorder-at-current-price + toast, buyer-data-isolation on orders, support helpline states, admin gating for super_admin vs buyer, no 'mode' word anywhere, 48px bottom-nav targets) is confirmed passing.",
+  "rca of the issue": "TypeError: Cannot read properties of undefined (reading 'map') originates from components/buyer-orders-view.tsx line 410: `selectedOrder.timeline.map((evt, idx) => ...)`. The type/shape of Order does not guarantee `timeline` on cached/local orders. Repro: seed `bb_orders` with a single order lacking a `timeline` array, open Orders tab, click 'View Details' → app boundary catches and shows the generic error card. Mitigation: replace with `(selectedOrder.timeline ?? []).map(...)` and render an empty-state message when no timeline events exist."
+}

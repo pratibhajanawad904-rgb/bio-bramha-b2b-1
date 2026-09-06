@@ -5,7 +5,7 @@ import path from 'path'
 const settingsFilePath = path.join(process.cwd(), 'lib', 'settings.json')
 
 const defaultSettings = {
-  helplineNumber: '1800-425-9999 / +91 94400 12345',
+  helplineNumber: '',
   helplineEmail: 'support@biobramha.com',
   paymentSettings: {
     qrCodeImage: null,

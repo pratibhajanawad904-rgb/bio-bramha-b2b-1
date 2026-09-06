@@ -23,7 +23,7 @@ export interface AppSettings {
 const SETTINGS_ROW_ID = 'global'
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  helplineNumber: '1800-425-9999 / +91 94400 12345',
+  helplineNumber: '',
   helplineEmail: 'support@biobramha.com',
   paymentSettings: {
     qrCodeImage: null,
