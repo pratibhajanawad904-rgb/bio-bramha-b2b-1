@@ -196,13 +196,21 @@ export const BuyerOrdersView: React.FC<{ onOpenCart?: () => void }> = ({ onOpenC
                     </div>
 
                     {/* Action Controls */}
-                    <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-100">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+                      <button
+                        onClick={() => setSelectedDetailOrderId(order.id)}
+                        className="py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <span>View Details →</span>
+                      </button>
+
                         <button
-                          onClick={() => setSelectedDetailOrderId(order.id)}
-                          className="py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                          onClick={() => handleReorder(order)}
+                          data-testid={`reorder-btn-${order.id}`}
+                          className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5 cursor-pointer"
                         >
-                          <span>View Order Details & Status →</span>
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Reorder</span>
                         </button>
 
                         {(order.status === 'placed' || order.status === 'accepted') && (
@@ -216,26 +224,16 @@ export const BuyerOrdersView: React.FC<{ onOpenCart?: () => void }> = ({ onOpenC
                             }}
                             className="py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl border border-rose-200 transition-colors flex items-center gap-1.5 cursor-pointer"
                           >
-                            <span>Cancel Order</span>
+                            <span>Cancel</span>
                           </button>
                         )}
 
-                        <button
-                          onClick={() => handleReorder(order)}
-                          data-testid={`reorder-btn-${order.id}`}
-                          className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                          <span>Reorder</span>
-                        </button>
-                      </div>
-
                       <a
                         href={`tel:${helplineNumber.split('/')[0].trim()}`}
-                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer ml-auto"
                       >
                         <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Support Helpline</span>
+                        <span>Helpline</span>
                       </a>
                     </div>
                   </div>
@@ -313,8 +311,8 @@ export const BuyerOrdersView: React.FC<{ onOpenCart?: () => void }> = ({ onOpenC
 
       {/* FULL ORDER DETAILS MODAL */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-[9999] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl space-y-6 relative border border-slate-200 animate-scale-up my-auto">
+        <div className="fixed inset-0 z-[9999] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 overflow-y-auto animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-xl w-full max-h-[88vh] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-5 relative border border-slate-200 animate-scale-up my-auto">
             <button
               onClick={() => setSelectedDetailOrderId(null)}
               className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors z-10"
@@ -342,13 +340,13 @@ export const BuyerOrdersView: React.FC<{ onOpenCart?: () => void }> = ({ onOpenC
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Order Status Timeline</h4>
               <div className="relative pl-6 space-y-3.5 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
                 {selectedOrder.timeline.map((evt, idx) => (
-                  <div key={idx} className="relative flex items-start justify-between gap-3 text-xs">
-                    <div className="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center ring-4 ring-slate-50">
+                  <div key={idx} className="relative flex items-start justify-between gap-2 text-xs">
+                    <div className="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center ring-4 ring-slate-50 shrink-0">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <span className="font-bold text-slate-900 block">{evt.label}</span>
-                      {evt.note && <span className="text-slate-500 block mt-0.5">{evt.note}</span>}
+                      {evt.note && <span className="text-slate-500 block mt-0.5 break-words">{evt.note}</span>}
                     </div>
                     <span className="text-slate-400 font-mono text-[11px] shrink-0">{evt.timestamp}</span>
                   </div>
@@ -361,15 +359,15 @@ export const BuyerOrdersView: React.FC<{ onOpenCart?: () => void }> = ({ onOpenC
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Ordered Bio-Products</h4>
               <div className="space-y-2">
                 {selectedOrder.items.map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                    <div className="flex items-center gap-3">
-                      {item.image && <img src={item.image} alt={item.name} className="w-9 h-9 object-contain bg-white rounded-lg p-0.5 border border-slate-200" />}
-                      <div>
-                        <span className="font-bold text-slate-900 block">{item.name}</span>
+                  <div key={idx} className="flex items-center justify-between gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {item.image && <img src={item.image} alt={item.name} className="w-9 h-9 object-contain bg-white rounded-lg p-0.5 border border-slate-200 shrink-0" />}
+                      <div className="min-w-0">
+                        <span className="font-bold text-slate-900 block truncate">{item.name}</span>
                         <span className="text-slate-500">Qty: {item.qty} x ₹{item.price}</span>
                       </div>
                     </div>
-                    <span className="font-extrabold text-slate-900">₹{item.qty * item.price}</span>
+                    <span className="font-extrabold text-slate-900 shrink-0">₹{item.qty * item.price}</span>
                   </div>
                 ))}
               </div>
@@ -397,7 +395,7 @@ export const BuyerOrdersView: React.FC<{ onOpenCart?: () => void }> = ({ onOpenC
             </div>
 
             {/* Support Contact Actions */}
-            <div className="pt-2 flex flex-wrap items-center justify-end gap-3">
+            <div className="pt-2 flex flex-wrap items-center justify-end gap-2">
               <a
                 href={`tel:${helplineNumber.split('/')[0].trim()}`}
                 className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"

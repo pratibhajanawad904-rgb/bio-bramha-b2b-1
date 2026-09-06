@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useApp } from '@/lib/app-context'
-import { X, Truck, CheckCircle2, ShieldCheck, MapPin, Phone, Building, AlertCircle, Plus, Star, Loader2, Package, Edit3 } from 'lucide-react'
+import { X, Truck, CheckCircle2, ShieldCheck, MapPin, Phone, Building, AlertCircle, Plus, Star, Loader2, Package, Edit3, Check } from 'lucide-react'
 import { isValidPhoneNumber, isValidPincode } from '@/lib/security'
 import { fetchAppSettings } from '@/lib/settings-client'
 import { api } from '@/lib/api-client'
@@ -48,7 +48,7 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
   const [placedOrder, setPlacedOrder] = useState<{ id: string; total: number } | null>(null)
 
   // MVP V1: a single fixed warehouse (Taloja, Mumbai, Maharashtra). No selection shown.
-  const warehouseId = 'wh-central'
+  const warehouseId = 'wh-taloja'
 
   // Load saved addresses + payment settings on open.
   React.useEffect(() => {
@@ -370,16 +370,41 @@ export const BuyerCheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClo
                             )}
                           </div>
                         </label>
-                        <button
-                          type="button"
-                          onClick={() => startEditAddress(a)}
-                          data-testid={`edit-address-${a.id}`}
-                          className="shrink-0 w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer"
-                          aria-label="Edit address"
-                          title="Edit address"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => startEditAddress(a)}
+                            data-testid={`edit-address-${a.id}`}
+                            className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer"
+                            aria-label="Edit address"
+                            title="Edit address"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          {!a.isDefault && (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const res = await api.updateAddress(a.id, { setDefault: true })
+                                if (res.success) {
+                                  const r = await api.getAddresses()
+                                  if (r.success && Array.isArray(r.addresses)) {
+                                    const list = r.addresses as SavedAddress[]
+                                    setSavedAddresses(list)
+                                    const def = list.find((x) => x.isDefault)
+                                    if (def) applyAddress(def)
+                                  }
+                                }
+                              }}
+                              data-testid={`set-default-address-${a.id}`}
+                              className="w-9 h-9 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center cursor-pointer"
+                              aria-label="Set as default"
+                              title="Set as default"
+                            >
+                              <Star className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
 
