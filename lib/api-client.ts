@@ -22,9 +22,18 @@ const API_BASE =
     ? (window as any).NEXT_PUBLIC_API_BASE_URL
     : ''
 
+let memoryToken: string | null = null
+
 function getSessionToken(): string | null {
+  if (memoryToken) return memoryToken
   if (typeof localStorage === 'undefined') return null
-  return localStorage.getItem('biobramha_session_token')
+  try {
+    const token = localStorage.getItem('biobramha_session_token')
+    if (token) memoryToken = token
+    return token
+  } catch {
+    return null
+  }
 }
 
 export interface ApiResponse<T = any> {

@@ -37,11 +37,21 @@ export async function GET(request: Request) {
     const session = getSession(request)
     if (!session) return unauthorized()
 
+    let effectiveRole = session.role
+    const { data: dbAccount } = await supabaseAdmin
+      .from('user_accounts')
+      .select('role')
+      .eq('phone', normalize(session.phone))
+      .maybeSingle()
+    if (dbAccount?.role) {
+      effectiveRole = dbAccount.role
+    }
+
     let query = supabaseAdmin.from('orders').select('*')
 
     // IDOR guard: a buyer's query is constrained to their own phone server-side.
     // Doing this here rather than trusting a client-supplied filter is the whole point.
-    if (!canSeeAllOrders(session.role)) {
+    if (!canSeeAllOrders(effectiveRole)) {
       query = query.eq('phone', normalize(session.phone))
     }
 
@@ -82,6 +92,16 @@ export async function PATCH(request: Request) {
     const session = getSession(request)
     if (!session) return unauthorized()
 
+    let effectiveRole = session.role
+    const { data: dbAccount } = await supabaseAdmin
+      .from('user_accounts')
+      .select('role')
+      .eq('phone', normalize(session.phone))
+      .maybeSingle()
+    if (dbAccount?.role) {
+      effectiveRole = dbAccount.role
+    }
+
     const body = await request.json().catch(() => ({}))
     const orderId = cleanText(body?.orderId, 64)
     const status = cleanText(body?.status, 20)
@@ -94,7 +114,7 @@ export async function PATCH(request: Request) {
 
     // Buyers may only cancel their own orders (not advance them through the pipeline).
     // Warehouse/admin/super_admin may set any status on any order.
-    const isBuyer = !canSeeAllOrders(session.role)
+    const isBuyer = !canSeeAllOrders(effectiveRole)
 
     if (isBuyer && status !== 'cancelled') {
       return NextResponse.json(
