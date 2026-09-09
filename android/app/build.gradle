@@ -16,8 +16,13 @@ android {
         applicationId "com.biobramha.dealermitra"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+<<<<<<< Updated upstream:android/app/build.gradle
         versionCode 20
         versionName "20.0.0"
+=======
+        versionCode 37
+        versionName "1.2"
+>>>>>>> Stashed changes:Downloads/bio-bramha-b2b-1-main (2)/bio-bramha-b2b-1-main/android/app/build.gradle
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -61,7 +66,7 @@ repositories {
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
     }
 }
-
+        1
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
@@ -71,7 +76,14 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+<<<<<<< Updated upstream:android/app/build.gradle
     implementation project(':capacitor-cordova-android-plugins')
+=======
+    if (project.findProject(':capacitor-cordova-android-plugins') != null) {
+        implementation project(':capacitor-cordova-android-plugins')
+    }
+    implementation 'com.facebook.android:facebook-android-sdk:17.0.0'
+>>>>>>> Stashed changes:Downloads/bio-bramha-b2b-1-main (2)/bio-bramha-b2b-1-main/android/app/build.gradle
 }
 
 apply from: 'capacitor.build.gradle'

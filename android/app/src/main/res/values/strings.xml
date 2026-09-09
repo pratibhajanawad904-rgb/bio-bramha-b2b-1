@@ -4,4 +4,6 @@
     <string name="title_activity_main">Dealer Mitra</string>
     <string name="package_name">com.biobramha.dealermitra</string>
     <string name="custom_url_scheme">com.biobramha.dealermitra</string>
+    <string name="facebook_app_id">1108705888271084</string>
+    <string name="fb_login_protocol_scheme">fb1108705888271084</string>
 </resources>
