@@ -131,6 +131,22 @@ export const ProductDetailModal: React.FC = () => {
                 <span>Government FCO Approved</span>
               </div>
             </div>
+
+            {/* Active Components & Description */}
+            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 space-y-3">
+              {selectedProduct.strain && (
+                <div>
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Active Components</h4>
+                  <p className="text-xs font-medium text-slate-800 italic">{selectedProduct.strain}</p>
+                </div>
+              )}
+              {selectedProduct.details?.description && (
+                <div>
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Description</h4>
+                  <p className="text-xs text-slate-600 leading-relaxed">{selectedProduct.details.description}</p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right Column: Detailed Product Information & Purchase */}

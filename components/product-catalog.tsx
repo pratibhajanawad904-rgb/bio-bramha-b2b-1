@@ -357,6 +357,19 @@ function ProductCard({ p, offerInfo, currentUser, setSelectedProduct, handleQuic
             {p.name}
           </h3>
 
+          {p.strain && (
+            <div className="mt-1.5 text-xs text-slate-600 bg-slate-50 p-2 rounded-xl border border-slate-100">
+              <span className="font-bold text-slate-700 block text-[10px] uppercase tracking-wider">Active Components:</span>
+              <span className="italic">{p.strain}</span>
+            </div>
+          )}
+
+          {p.details?.description && (
+            <p className="mt-1.5 text-xs text-slate-500 line-clamp-2 leading-relaxed">
+              {p.details.description}
+            </p>
+          )}
+
           {offerInfo.hasOffer && (
             <div className="mt-2 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg inline-block">
               Direct Offer: {offerInfo.offerTitle}
