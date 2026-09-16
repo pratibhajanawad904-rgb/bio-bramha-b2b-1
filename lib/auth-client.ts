@@ -42,7 +42,7 @@ export interface ServerLoginResult {
  * Vercel backend, configured at build time via NEXT_PUBLIC_API_BASE_URL
  * (see .env.production.apk and scripts/build-apk.mjs).
  */
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || ''
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://bio-bramha-b2b-1.vercel.app'
 
 /**
  * POSTs JSON to a server /api route, using CapacitorHttp inside the packaged app
