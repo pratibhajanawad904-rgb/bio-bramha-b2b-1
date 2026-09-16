@@ -20,7 +20,7 @@ const API_BASE =
     ? process.env.NEXT_PUBLIC_API_BASE_URL
     : typeof window !== 'undefined' && (window as any).NEXT_PUBLIC_API_BASE_URL
     ? (window as any).NEXT_PUBLIC_API_BASE_URL
-    : ''
+    : 'https://bio-bramha-b2b-1.vercel.app'
 
 let memoryToken: string | null = null
 
